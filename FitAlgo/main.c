@@ -20,7 +20,7 @@ int main()
     //output random objects
     for (size_t i = 0; i < OBJECTNUMBER; i++)
     {
-        printf("%d : %d \n",i,vObject[i].size);
+        printf("%zu : %d \n",i,vObject[i].size);
     }
 
     free(memory);
