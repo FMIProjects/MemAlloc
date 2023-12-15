@@ -10,22 +10,25 @@
 struct Object vObject[OBJECTNUMBER];
 
 /*
+    Fun fact!
     the maximum number of holes in a memory of and even size of bytes is that size of the whole memory
     divided by 2 (first bytes is allocated, the second is not, the third is and so on). In this case the
     maximum number of Holes is 100mb/2 in bytes ~= 52 milion bytes. A single hole takes 32 bytes. So
     the vector of holes needs to be like 1.6 billion bytes => 1.5 Gb of memory.
 */
 
-struct Hole vHoles[MAX_HOLES];
-
- // the number of holes that are currently in the memory, at start the whole memory space is a hole
-int numberHoles=1;
+struct Hole* startHole;
 
 int main()
 {
     void *memory = AllocMainBlock();
     
-    
+    // create new hole
+    startHole=(struct Hole* )malloc(sizeof(struct Hole));
+
+    // there is only one hole at start being the main memory
+    startHole->size=MAINBLOCKSIZE;
+    startHole->startAddress=0;
 
     GenerateRandomObjects(vObject);
 
