@@ -19,7 +19,7 @@ void *AllocMainBlock()
 void GenerateRandomObjects(struct Object *array)
 {
     srand(time(NULL));
-    for (size_t i = 0; i < OBJECTNUMBER; i++)
+    for (int i = 0; i < OBJECTNUMBER; i++)
     {
         // Generate a random size for each object [1,1024] bytes
         size_t objectSize = (rand() % 1024) + 1;
