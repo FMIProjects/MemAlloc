@@ -7,7 +7,7 @@
 #include "include/object.h"
 #include "include/hole.h"
 
-struct Object vObject[OBJECTNUMBER * sizeof(struct Object)];
+struct Object vObject[OBJECTNUMBER];
 
 int main()
 {
@@ -20,7 +20,7 @@ int main()
     //output random objects
     for (size_t i = 0; i < OBJECTNUMBER; i++)
     {
-        printf("%zu : %d \n",i,vObject[i].size);
+        printf("%zu : %zu \n",i,vObject[i].size);
     }
 
     free(memory);
