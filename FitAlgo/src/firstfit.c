@@ -10,7 +10,7 @@ extern void * memory;
 
 struct Block* firstFit(size_t processSize){
     
-    // using this pointer we will iterate through the hole list
+    //by using this pointer we will iterate through the hole list
     struct Block* currentHole= firstHole;
 
     // search into the list the first large enough hole 
