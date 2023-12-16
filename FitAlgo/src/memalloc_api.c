@@ -16,15 +16,14 @@ void *AllocMainBlock()
     return memoryBlock;
 }
 
-void GenerateRandomObjects(struct Object *array)
+void GenerateRandomSizes(size_t *array)
 {
     srand(time(NULL));
     for (int i = 0; i < OBJECTNUMBER; i++)
     {
         // Generate a random size for each object [1,1024] bytes
         size_t objectSize = (rand() % 1024) + 1;
-
-        array[i].size = objectSize;
+        array[i] = objectSize;
     }
 }
 

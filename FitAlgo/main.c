@@ -6,7 +6,7 @@
 
 #include "include/block.h"
 
-struct Object vObject[OBJECTNUMBER];
+size_t vSizesToAllocate[OBJECTNUMBER];
 
 /*
     Fun fact!
@@ -22,21 +22,14 @@ int main()
 {
     void *memory = AllocMainBlock();
     
-    // create new hole
-    startHole=(struct Hole* )malloc(sizeof(struct Hole));
-
-    // there is only one hole at start being the main memory
-    startHole->size=MAINBLOCKSIZE;
-    startHole->startAddress=0;
-
-    GenerateRandomObjects(vObject);
+    GenerateRandomSizes(vSizesToAllocate);
 
     //GenerateRandomBlocks();
     
     //output random objects
     for (int i = 0; i < OBJECTNUMBER; i++)
     {
-        printf("%zu : %zu \n",i,vObject[i].size);
+        printf("%d : %zu \n",i,vSizesToAllocate[i]);
     }
 
    

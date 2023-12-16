@@ -14,7 +14,7 @@
 void *AllocMainBlock();
 
 // method to generate random objects
-void GenerateRandomObjects(struct Object *array);
+void GenerateRandomSizes(size_t *array);
 
 // method to generate random blocks that add up to MAINBLOCKSIZE
 //void GenerateRandomBlocks();
