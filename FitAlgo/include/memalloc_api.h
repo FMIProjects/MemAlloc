@@ -16,6 +16,9 @@ void *AllocMainBlock();
 // method to generate random objects
 void GenerateRandomSizes(size_t *array);
 
+// method to print the contents of a block
+void printGivenBlock(struct Block* block);
+
 // method to generate random blocks that add up to MAINBLOCKSIZE
 //void GenerateRandomBlocks();
 

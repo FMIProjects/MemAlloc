@@ -16,9 +16,9 @@ size_t vSizesToAllocate[OBJECTNUMBER];
     the vector of holes needs to be like 1.6 billion bytes => 1.5 Gb of memory.
 */
 
-struct Block* firstHole;
+struct Block* firstHole = NULL;
 
-struct Block* firstObject;
+struct Block* firstObject = NULL;
 
 void * memory;
 
@@ -35,14 +35,19 @@ int main()
 
     //GenerateRandomBlocks();
     
-    //output random objects
-    for (int i = 0; i < OBJECTNUMBER; i++)
-    {
-        printf("%d : %zu \n",i,vSizesToAllocate[i]);
-    }
+    // //output random objects
+    // for (int i = 0; i < OBJECTNUMBER; i++)
+    // {
+    //     printf("%d : %zu \n",i,vSizesToAllocate[i]);
+    // }
 
-    
-   
+
+    firstFit(20);
+
+    printf("Holes\n\n");
+    printGivenBlock(firstHole);
+    printf("\n\n\nObjects\n");
+    printGivenBlock(firstObject);
 
     free(memory);
     exit(0);

@@ -27,6 +27,26 @@ void GenerateRandomSizes(size_t *array)
     }
 }
 
+void printGivenBlock(struct Block* block){
+
+    struct Block* currentBlock=block;
+
+    int blockNumber=1;
+
+    while(currentBlock!=NULL){
+
+        printf("-----------------------------\n");
+        printf("Block number: %d \n",blockNumber);
+        printf("Size of block: %zu \n",currentBlock->size);
+        printf("Start address of block: %zu \n",currentBlock->startAddress);
+        printf("-----------------------------\n");
+
+        currentBlock=currentBlock->next;
+        ++blockNumber;
+    }
+    
+}
+
 /*
 void GenerateRandomBlocks()
 {

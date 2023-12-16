@@ -64,12 +64,9 @@ struct Block* firstFit(size_t processSize){
     }
         
 
-
     // using this pointer we will iterate through the object list
     struct Block* currentObject = firstObject;
     
-   
-
     // find the allocated objects that are between the current hole
     while(currentObject!=NULL){
 
@@ -88,8 +85,6 @@ struct Block* firstFit(size_t processSize){
 
     }
 
-    
-
     // place the new object between the found objects (if they exist)
 
     if(previousObject!=NULL){
@@ -104,8 +99,6 @@ struct Block* firstFit(size_t processSize){
         newObject->next = nextObject;
         nextObject->previous = newObject;
     }
-    
-
     
 
     return newObject;
