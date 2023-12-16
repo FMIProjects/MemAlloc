@@ -35,6 +35,7 @@ void printGivenBlock(struct Block* block){
 
     while(currentBlock!=NULL){
 
+       
         printf("-----------------------------\n");
         printf("Block number: %d \n",blockNumber);
         printf("Size of block: %zu \n",currentBlock->size);

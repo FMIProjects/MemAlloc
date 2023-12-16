@@ -30,6 +30,8 @@ int main()
     firstHole = (struct Block*) malloc(sizeof(struct Block));
     firstHole-> size = MAINBLOCKSIZE;
     firstHole-> startAddress = 0;
+    firstHole-> previous=NULL;
+    firstHole-> next=NULL;
 
     GenerateRandomSizes(vSizesToAllocate);
 
@@ -43,7 +45,9 @@ int main()
 
 
     firstFit(20);
-
+    firstFit(5);
+    firstFit(87);
+    
     printf("Holes\n\n");
     printGivenBlock(firstHole);
     printf("\n\n\nObjects\n");

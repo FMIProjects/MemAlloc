@@ -1,3 +1,4 @@
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -28,7 +29,9 @@ struct Block* firstFit(size_t processSize){
     // create a new allocated block
     struct Block* newObject = (struct Block*)malloc(sizeof(struct Block));
     newObject->size = processSize;
-    newObject->startAddress = currentHole->startAddress; 
+    newObject->startAddress = currentHole->startAddress;
+    newObject ->next=NULL;
+    newObject ->previous=NULL; 
 
     //needed blocks
     struct Block* previousHole = currentHole->previous;
