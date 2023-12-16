@@ -16,11 +16,15 @@ size_t vSizesToAllocate[OBJECTNUMBER];
     the vector of holes needs to be like 1.6 billion bytes => 1.5 Gb of memory.
 */
 
-struct Hole* startHole;
+struct Block* firstHole;
+
+struct Block* firstObject;
+
+void * memory;
 
 int main()
 {
-    void *memory = AllocMainBlock();
+    memory = AllocMainBlock();
     
     GenerateRandomSizes(vSizesToAllocate);
 
