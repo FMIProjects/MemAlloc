@@ -1,8 +1,7 @@
 #ifndef _MA_MEMALLOC_API_H
 #define _MA_MEMALLOC_API_H
 
-#include "object.h"
-#include "hole.h"
+#include "block.h"
 
 // 100 MB in B
 #define MAINBLOCKSIZE 104857600

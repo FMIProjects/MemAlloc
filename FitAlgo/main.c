@@ -4,8 +4,7 @@
 #include "include/memalgo.h"
 #include "include/memalloc_api.h"
 
-#include "include/object.h"
-#include "include/hole.h"
+#include "include/block.h"
 
 struct Object vObject[OBJECTNUMBER];
 

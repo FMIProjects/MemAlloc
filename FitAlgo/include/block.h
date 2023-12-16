@@ -1,9 +1,9 @@
-#ifndef _MA_HOLE_H
-#define _MA_HOLE_H
+#ifndef _MA_BLOCK_H
+#define _MA_BLOCK_H
 
 #include<stddef.h>
 
-struct Hole{
+struct Block{
 	size_t size;
 	size_t startAddress;
 	struct Hole *next;
