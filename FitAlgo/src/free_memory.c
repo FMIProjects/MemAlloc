@@ -45,7 +45,27 @@ void freeMemory(struct Block* object){
 
     }
 
-    //seems like lots of cases
+    // case when there is no previous hole
+    if(nextHole!=NULL && previousHole==NULL){
+
+        nextHole->startAddress = object->startAddress;
+        nextHole->size += object->size;
+    }
+
+    // case when there is no next hole
+    if(previousHole!=NULL && nextHole==NULL){
+
+        previousHole->size += object->size;
+    }
+
+    // case when there are both holes, merge them
+
+    if(previousHole!=NULL && nextHole!=NULL){
+
+        previousHole->size += object->size + nextHole-> size;
+        previousHole->next = nextHole->next;
+    }
 
 
+    free(object);
 }
