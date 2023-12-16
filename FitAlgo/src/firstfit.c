@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-
+#include <stdbool.h>
 #include "../include/block.h"
 
 extern struct Block* firstHole;
@@ -30,35 +30,12 @@ struct Block* firstFit(size_t processSize){
     newObject->size = processSize;
     newObject->startAddress = currentHole->startAddress; 
 
-    // find needed blocks
+    //needed blocks
     struct Block* previousHole = currentHole->previous;
     struct Block* nextHole = currentHole -> next;
     struct Block* previousObject;
     struct Block* nextObject;
 
-    // using this pointer we will iterate through the object list
-    struct Block* currentObject = firstObject;
-
-    // find the allocated objects that are between the current hole
-    while(currentObject!=NULL){
-
-        if(currentObject->startAddress < currentHole->startAddress){
-            previousObject = currentObject;
-            nextObject = currentObject->next;
-        }
-        else break;
-
-        currentObject = currentObject->next;
-
-    }
-
-    // place the new object between the found objects
-    previousObject->next = newObject;
-    
-    newObject->previous = previousObject;
-    newObject->next = nextObject;
-
-    nextObject->previous = newObject;
 
     //modify or delete current Hole
 
@@ -78,6 +55,58 @@ struct Block* firstFit(size_t processSize){
         currentHole->startAddress += processSize;
 
     }
+
+    // test if there are no objects allocated
+    if(firstObject==NULL){
+
+        firstObject=newObject;
+        return newObject;
+    }
+        
+
+
+    // using this pointer we will iterate through the object list
+    struct Block* currentObject = firstObject;
+    
+   
+
+    // find the allocated objects that are between the current hole
+    while(currentObject!=NULL){
+
+        if(currentObject->startAddress < currentHole->startAddress){
+           
+            previousObject = currentObject;
+            nextObject = currentObject->next;
+        }
+        else{
+            // when the first Object that is at a higher address than the hole is found the loop ends and the nextObject is updated
+            nextObject = currentObject;
+            break;
+        }
+
+        currentObject = currentObject->next;
+
+    }
+
+    
+
+    // place the new object between the found objects (if they exist)
+
+    if(previousObject!=NULL){
+
+        previousObject->next = newObject;
+        newObject->previous = previousObject;
+    }
+        
+    
+    if(nextObject!=NULL){
+
+        newObject->next = nextObject;
+        nextObject->previous = newObject;
+    }
+    
+
+    
 
     return newObject;
 }
