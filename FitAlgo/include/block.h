@@ -6,8 +6,8 @@
 struct Block{
 	size_t size;
 	size_t startAddress;
-	struct Hole *next;
-	struct Hole *previous;
+	struct Block *next;
+	struct Block *previous;
 };
 
 #endif

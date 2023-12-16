@@ -25,7 +25,12 @@ void * memory;
 int main()
 {
     memory = AllocMainBlock();
-    
+
+    //create the first hole which will be the whole memory
+    firstHole = (struct Block*) malloc(sizeof(struct Block));
+    firstHole-> size = MAINBLOCKSIZE;
+    firstHole-> startAddress = 0;
+
     GenerateRandomSizes(vSizesToAllocate);
 
     //GenerateRandomBlocks();
@@ -36,6 +41,7 @@ int main()
         printf("%d : %zu \n",i,vSizesToAllocate[i]);
     }
 
+    
    
 
     free(memory);

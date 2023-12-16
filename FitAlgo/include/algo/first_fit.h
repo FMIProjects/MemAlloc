@@ -4,6 +4,6 @@
 
 #include "../block.h"
 
-struct Object* firstFit(size_t size, void* mainMemory , struct Object* objectToBlock,struct Hole* holes);
+struct Block* firstFit(size_t processSize);
 
 #endif
