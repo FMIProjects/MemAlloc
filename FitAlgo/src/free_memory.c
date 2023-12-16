@@ -45,16 +45,56 @@ void freeMemory(struct Block* object){
 
     }
 
-    // the number of bytes between the main object and the previous and next ones
-    size_t distanceNext = nextObject->startAddress - object->size - object->startAddress;
-    size_t distancePrevious = previousObject-> startAddress + previousObject->size - object->startAddress;
+    
+    // remeinder to treat cases when there are no holes and there are more blocks near one anothers
 
     //treat the cases when there is no hole between the blocks
-    if(nextObject!=NULL && previousObject==NULL && distanceNext==0){
 
-    }else if(nextObject==NULL && previousObject!=NULL && distancePrevious==0){
+    //case when there are 2 blocks near each other and the one being deallocated is the one on the left
+    if(nextObject!=NULL && nextHole->startAddress > nextObject->startAddress){
 
-    }else if(nextObject!=NULL && previousObject!=NULL && distancePrevious==0 && distanceNext==0){
+        previousHole->size += object->size;
+
+        if(previousObject!=NULL){
+
+            nextObject->previous = previousObject;
+            previousObject->next = nextObject;
+        }
+        
+        free(object);
+        return;
+
+
+    }
+    //case when there are 2 blocks near each other and the one being deallocated is the one on the right
+    else if(nextObject==NULL && previousObject!=NULL && previousHole->startAddress < previousObject->startAddress){
+
+        nextHole->size += object->size;
+        nextHole-> startAddress = object->startAddress;
+
+        if(nextObject!=NULL){
+            nextObject->previous = previousObject;
+            previousObject->next = nextObject;
+        }
+
+        free(object);
+        return;
+
+    }
+    //case when there are more than 2 blocks near one another
+    else if(nextObject!=NULL && previousObject!=NULL &&
+            nextHole->startAddress > nextObject->startAddress &&
+            previousHole->startAddress < previousObject->startAddress){
+
+        nextObject->previous = previousObject;
+        previousObject->next = nextObject;
+
+        // no need to deallocate the block of memory, it will just become a hole
+
+        previousHole->next = object;
+        object -> previous = previousHole;
+        object -> next = nextHole;
+        nextHole -> previous = object;
 
     }
 

@@ -43,15 +43,18 @@ int main()
     //     printf("%d : %zu \n",i,vSizesToAllocate[i]);
     // }
 
+    for(int i=0;i<OBJECTNUMBER;++i){
 
-    firstFit(20);
-    firstFit(5);
-    firstFit(87);
-    
-    printf("Holes\n\n");
-    printGivenBlock(firstHole);
-    printf("\n\n\nObjects\n");
+        firstFit(vSizesToAllocate[i]);
+        
+    }
+
+    printf("\n\n\nObjects\n\n");
     printGivenBlock(firstObject);
+    printf("\n\n\nHoles\n\n");
+    printGivenBlock(firstHole);
+    
+    
 
     free(memory);
     exit(0);
