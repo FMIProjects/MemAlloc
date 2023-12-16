@@ -45,6 +45,20 @@ void freeMemory(struct Block* object){
 
     }
 
+    // the number of bytes between the main object and the previous and next ones
+    size_t distanceNext = nextObject->startAddress - object->size - object->startAddress;
+    size_t distancePrevious = previousObject-> startAddress + previousObject->size - object->startAddress;
+
+    //treat the cases when there is no hole between the blocks
+    if(nextObject!=NULL && previousObject==NULL && distanceNext==0){
+
+    }else if(nextObject==NULL && previousObject!=NULL && distancePrevious==0){
+
+    }else if(nextObject!=NULL && previousObject!=NULL && distancePrevious==0 && distanceNext==0){
+
+    }
+
+
     // case when there is no previous hole
     if(nextHole!=NULL && previousHole==NULL){
 
