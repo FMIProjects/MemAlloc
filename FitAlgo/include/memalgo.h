@@ -5,5 +5,6 @@
 #include "algo/best_fit.h"
 #include "algo/next_fit.h"
 #include "algo/worst_fit.h"
+#include "algo/free_memory.h"
 
 #endif

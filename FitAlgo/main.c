@@ -43,12 +43,23 @@ int main()
     //     printf("%d : %zu \n",i,vSizesToAllocate[i]);
     // }
 
-    for(int i=0;i<OBJECTNUMBER;++i){
+    // for(int i=0;i<OBJECTNUMBER;++i){
 
-        firstFit(vSizesToAllocate[i]);
+    //     firstFit(vSizesToAllocate[i]);
         
-    }
+    // }
+    struct Block* blk[100];
+    blk[0]=firstFit(20);
+    blk[1]=firstFit(6);
+    blk[2]=firstFit(53);
 
+    // printf("%p  %p\n",firstObject->next, blk[2]->previous);
+    // printf("%p  %p\n",firstObject, blk[2]->previous->previous);
+    // printf("%p  %p\n",firstObject->next->next, blk[2]);
+    freeMemory(blk[0]);
+    blk[4]=firstFit(15);
+    
+    
     printf("\n\n\nObjects\n\n");
     printGivenBlock(firstObject);
     printf("\n\n\nHoles\n\n");

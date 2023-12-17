@@ -14,12 +14,33 @@ void freeMemory(struct Block* object){
     struct Block* previousObject = object-> previous;
     struct Block* nextObject = object-> next;
 
+    // the current object will become a hole so it is safe to sanitize it
+    object->previous=NULL;
+    object->next = NULL;
+
     // take the next and previous objects of the object that is deallocated and connect them directly 
-    if(previousObject!=NULL)
+    if(previousObject!=NULL){
         previousObject->next = nextObject;
 
-    if(nextObject!=NULL)
+        // modify the first object if the object to deallocate is actuallly the first object
+        if(firstObject==object)
+            firstObject = previousObject;
+    }
+        
+
+    if(nextObject!=NULL){
+
         nextObject-> previous = previousObject;
+
+        // modify the first object into the next object if there is no previous object
+        if(firstObject == object && previousObject==NULL)
+            firstObject = nextObject;
+    }
+
+    // if the object to deallocate is the only object just make the first object empty
+    if(nextObject==NULL && previousObject == NULL ){
+        firstObject = NULL;
+    }
 
     //the current object just becomes a hole so it needs to be added to the proper position into the hole list
 
@@ -46,80 +67,66 @@ void freeMemory(struct Block* object){
     }
 
     
-    // remeinder to treat cases when there are no holes and there are more blocks near one anothers
 
-    //treat the cases when there is no hole between the blocks
+    // case when the memory is full and there is no Hole
 
-    //case when there are 2 blocks near each other and the one being deallocated is the one on the left
-    if(nextObject!=NULL && nextHole->startAddress > nextObject->startAddress){
+    if(nextHole==NULL&& previousHole==NULL){
 
-        previousHole->size += object->size;
+        // no need to deallocate we will use the effective pointer
+        firstHole = currentHole;
+        firstHole->next = NULL;
+        firstHole->previous = NULL;
 
-        if(previousObject!=NULL){
-
-            nextObject->previous = previousObject;
-            previousObject->next = nextObject;
-        }
+        return;
         
-        free(object);
-        return;
-
-
     }
-    //case when there are 2 blocks near each other and the one being deallocated is the one on the right
-    else if(nextObject==NULL && previousObject!=NULL && previousHole->startAddress < previousObject->startAddress){
 
-        nextHole->size += object->size;
-        nextHole-> startAddress = object->startAddress;
 
-        if(nextObject!=NULL){
-            nextObject->previous = previousObject;
-            previousObject->next = nextObject;
+    if(previousHole!=NULL){
+        previousHole->next = object;
+        object->previous = previousHole;
+
+        // test if the holes can be merged
+        if(previousHole->startAddress + previousHole-> size == object->startAddress){
+
+            object->size += previousHole->size;
+            object-> startAddress = previousHole->startAddress;
+            object -> previous = previousHole->previous;
+
+            if(previousHole==firstHole)
+                firstHole=object;
+            // no need to keep it anymore
+            free(previousHole);
         }
 
-        free(object);
-        return;
-
-    }
-    //case when there are more than 2 blocks near one another
-    else if(nextObject!=NULL && previousObject!=NULL &&
-            nextHole->startAddress > nextObject->startAddress &&
-            previousHole->startAddress < previousObject->startAddress){
-
-        nextObject->previous = previousObject;
-        previousObject->next = nextObject;
-
-        // no need to deallocate the block of memory, it will just become a hole
-
-        previousHole->next = object;
-        object -> previous = previousHole;
-        object -> next = nextHole;
-        nextHole -> previous = object;
-
     }
 
+    if(nextHole!=NULL){
 
-    // case when there is no previous hole
-    if(nextHole!=NULL && previousHole==NULL){
+        object->next = nextHole;
+        nextHole->previous = object;
 
-        nextHole->startAddress = object->startAddress;
-        nextHole->size += object->size;
+        //test if the holes can be merged
+
+        if(object->startAddress + object->size == nextHole->startAddress){
+
+            object->size += nextHole->size;
+            object->next = nextHole->next;
+
+            if(nextHole==firstHole)
+                firstHole=object;
+            // no need to keep it anymore
+            free(nextHole);
+
+        }
+
+
     }
 
-    // case when there is no next hole
-    if(previousHole!=NULL && nextHole==NULL){
-
-        previousHole->size += object->size;
-    }
-
-    // case when there are both holes, merge them
-
-    if(previousHole!=NULL && nextHole!=NULL){
-
-        previousHole->size += object->size + nextHole-> size;
-        previousHole->next = nextHole->next;
+    // case when the nextHole is the firstHole
+    while(firstHole->previous !=NULL){
+        firstHole = firstHole->previous;
     }
 
 
-    free(object);
 }
