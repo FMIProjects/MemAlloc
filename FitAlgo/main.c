@@ -7,6 +7,10 @@
 size_t vSizesToAllocate[OBJECTNUMBER];
 struct Block *firstHole = NULL;
 struct Block *firstObject = NULL;
+
+// Used for NextFit
+struct Block *lastHole = NULL;
+
 void *memory;
 
 int main()
@@ -22,6 +26,7 @@ int main()
 
     GenerateRandomSizes(vSizesToAllocate);
 
+    /* First Fit Example
     struct Block *blk[100];
     blk[0] = FirstFit(104857575);
     blk[1] = FirstFit(20);
@@ -31,6 +36,15 @@ int main()
 
     FreeMemory(blk[0]);
     FreeMemory(blk[2]);
+    */
+
+    /* Next Fit Example*/
+    struct Block *blk[100];
+    blk[0] = NextFit(150);
+    FreeMemory(blk[0]);
+    blk[1] = NextFit(200);
+    blk[2] = NextFit(50);
+
 
     printf("\n\n\nObjects\n\n");
     PrintBlock(firstObject);
