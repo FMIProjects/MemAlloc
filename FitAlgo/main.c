@@ -49,12 +49,14 @@ int main()
         
     // }
     struct Block* blk[100];
-    blk[0]=firstFit(20);
-    blk[1]=firstFit(104857580);
+    blk[0]=firstFit(104857575);
+    blk[1]=firstFit(20);
+    blk[2]=firstFit(5);
     
-    // printf("%p  %p\n",firstObject->next->previous,firstObject->next->next);
+    // printf("%p  %p\n",blk[1]->previous,blk[0]);
 
-    freeMemory(blk[1]);
+    freeMemory(blk[0]);
+    freeMemory(blk[2]);
 
     printf("\n\n\nObjects\n\n");
     printGivenBlock(firstObject);

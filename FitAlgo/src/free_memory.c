@@ -10,7 +10,7 @@ extern void * memory;
 
 void freeMemory(struct Block* object){
 
-
+    // obtain the previous and next objects of the object that will be deallocated
     struct Block* previousObject = object-> previous;
     struct Block* nextObject = object-> next;
 
@@ -18,7 +18,7 @@ void freeMemory(struct Block* object){
     object->previous=NULL;
     object->next = NULL;
 
-    // take the next and previous objects of the object that is deallocated and connect them directly 
+    // take the next and previous objects of the object that is deallocated and connect them directly if possible
     if(previousObject!=NULL){
         previousObject->next = nextObject;
 
@@ -32,7 +32,7 @@ void freeMemory(struct Block* object){
 
         nextObject-> previous = previousObject;
 
-        // modify the first object into the next object if there is no previous object
+        // modify the first object into the next object if there is no previous object and if the object to deallocate is the first object
         if(firstObject == object && previousObject==NULL)
             firstObject = nextObject;
     }
@@ -45,11 +45,12 @@ void freeMemory(struct Block* object){
     //the current object just becomes a hole so it needs to be added to the proper position into the hole list
 
     //by using this pointer we will iterate through the hole list
-    // it is needed to find the previous and next holes of the object that will be deallocated
+   
     struct Block* currentHole=firstHole;
     struct Block* previousHole=NULL;
     struct Block* nextHole=NULL;
 
+     // it is needed to find the previous and next holes of the object that will be deallocated
     while(currentHole!=NULL){
 
         if(currentHole->startAddress < object->startAddress){
@@ -77,11 +78,12 @@ void freeMemory(struct Block* object){
         firstHole->next = NULL;
         firstHole->previous = NULL;
 
+        // can be ended
         return;
         
     }
 
-
+    // connect the previous hole to the deallocated object(which is a hole now)
     if(previousHole!=NULL){
         previousHole->next = object;
         object->previous = previousHole;
@@ -93,14 +95,17 @@ void freeMemory(struct Block* object){
             object-> startAddress = previousHole->startAddress;
             object -> previous = previousHole->previous;
 
+            // careful to update the firstHole
             if(previousHole==firstHole)
                 firstHole=object;
+
             // no need to keep it anymore
             free(previousHole);
         }
 
     }
 
+    // connect the next hole to the deallocated object(which is a hole now)
     if(nextHole!=NULL){
 
         object->next = nextHole;
@@ -113,6 +118,7 @@ void freeMemory(struct Block* object){
             object->size += nextHole->size;
             object->next = nextHole->next;
 
+             // careful to update the firstHole
             if(nextHole==firstHole)
                 firstHole=object;
             // no need to keep it anymore
