@@ -73,7 +73,7 @@ void freeMemory(struct Block* object){
     if(nextHole==NULL&& previousHole==NULL){
 
         // no need to deallocate we will use the effective pointer
-        firstHole = currentHole;
+        firstHole = object;
         firstHole->next = NULL;
         firstHole->previous = NULL;
 

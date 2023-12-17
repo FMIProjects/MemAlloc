@@ -38,8 +38,8 @@ void printGivenBlock(struct Block* block){
        
         printf("-----------------------------\n");
         printf("Block number: %d \n",blockNumber);
-        printf("Size of block: %zu \n",currentBlock->size);
         printf("Start address of block: %zu \n",currentBlock->startAddress);
+        printf("Size of block: %zu \n",currentBlock->size);
         printf("-----------------------------\n");
 
         currentBlock=currentBlock->next;

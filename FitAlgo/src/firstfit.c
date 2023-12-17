@@ -45,8 +45,20 @@ struct Block* firstFit(size_t processSize){
     // the hole dissapears when it has exactly the same size as the requested process size
     if(currentHole->size == processSize){
 
-        previousHole->next = nextHole;
-        nextHole->previous = previousHole;
+        // must test if the holes exists, otherwise we will just delete the hole
+
+
+        if(previousHole!=NULL){
+            previousHole->next = nextHole;
+        }
+        else{
+            // if there is  no previous hole then the first hole becomes the next 
+            firstHole=nextHole;
+        }
+            
+
+        if(nextHole!=NULL)
+            nextHole->previous = previousHole;
 
         free(currentHole);
 
