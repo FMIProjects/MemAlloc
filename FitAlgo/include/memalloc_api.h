@@ -3,23 +3,37 @@
 
 #include "block.h"
 
+//--------------------------- Defines --------------------------------//
+
 // 100 MB in B
 #define MAINBLOCKSIZE 104857600
 // Number of Objects
 #define OBJECTNUMBER 10000
-//Maximum number of holes that can be created
+// Maximum number of holes that can be created
 #define MAX_HOLES 52428800
- 
-// method to allocate main block to heap
+
+//--------------------------- Methods -------------------------------//
+
+// Method to allocate main block to heap
 void *AllocMainBlock();
 
-// method to generate random objects
+// Method to generate random objects
 void GenerateRandomSizes(size_t *array);
 
-// method to print the contents of a block
-void printGivenBlock(struct Block* block);
+// Method to print the contents of a block
+void PrintBlock(struct Block *block);
 
-// method to generate random blocks that add up to MAINBLOCKSIZE
-//void GenerateRandomBlocks();
+// Custom Free Method
+void FreeMemory(struct Block *object);
+
+// Custom Alloc Method
+struct Block *AllocMemory(struct Block *currentHole, size_t processSize);
+
+//---------------------- Allocation Algorithms ----------------------//
+
+struct Block *FirstFit(size_t processSize);
+struct Block *BestFit(size_t processSize);
+struct Block *NextFit(size_t processSize);
+struct Block *WorstFit(size_t processSize);
 
 #endif
