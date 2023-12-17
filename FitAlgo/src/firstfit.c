@@ -95,7 +95,10 @@ struct Block* firstFit(size_t processSize){
         previousObject->next = newObject;
         newObject->previous = previousObject;
     }
-        
+    else {
+        // if there is no previous object that means the new object will become the firstObject
+        firstObject = newObject;
+    }    
     
     if(nextObject!=NULL){
 
