@@ -40,10 +40,18 @@ int main()
 
     /* Next Fit Example*/
     struct Block* blk[100];
-    // blk[0] = NextFit(150);
-    // FreeMemory(blk[0]);
-    // blk[1] = NextFit(200);w
-    // blk[2] = NextFit(50);
+
+    blk[0] = FirstFit(150);
+
+    blk[1] = NextFit(500);
+    FreeMemory(blk[0]);
+
+    blk[3] = NextFit(100);
+    blk[4] = NextFit(25);
+
+    
+    blk[5] = FirstFit(40);
+    blk[6] = FirstFit(20);
 
 
     printf("\n\n\nObjects\n\n");
