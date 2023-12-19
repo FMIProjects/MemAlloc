@@ -39,11 +39,11 @@ int main()
     */
 
     /* Next Fit Example*/
-    struct Block *blk[100];
-    blk[0] = NextFit(150);
-    FreeMemory(blk[0]);
-    blk[1] = NextFit(200);
-    blk[2] = NextFit(50);
+    struct Block* blk[100];
+    // blk[0] = NextFit(150);
+    // FreeMemory(blk[0]);
+    // blk[1] = NextFit(200);w
+    // blk[2] = NextFit(50);
 
 
     printf("\n\n\nObjects\n\n");

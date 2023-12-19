@@ -14,10 +14,13 @@ extern void *memory;
 // this needs to be fixed
 struct Block *NextFit(size_t processSize)
 {
+
+    static size_t lastAllocatedAddress = 0;
+
+
+
     // number of holes
     size_t holeCount = 0;
-
-    size_t validHoleCount = 0;
 
     // checker if we find a hole
     bool holeFound = false;
@@ -25,52 +28,39 @@ struct Block *NextFit(size_t processSize)
     // by using this pointer we will iterate through the hole list
     struct Block *currentHole = firstHole;
 
-    // determine the number of holes
+    struct Block *firstHoleBeforeLast =NULL;
+
+    // determine the next hole after the last allocated address
     while (currentHole != NULL)
     {
-        holeCount++;
-        currentHole = currentHole->next;
-    }
+        // determine the first hole before the last memory adress
+        // if there is no proper hole after the last allocated address then proper hole will be firstHoleBeforeLast
+        if(firstHoleBeforeLast==NULL &&
+            currentHole->startAddress < lastAllocatedAddress &&
+            currentHole->size >= processSize){
 
-    // if it's not the first hole we start searching from the last hole
-    // position found
-    if (lastHole != NULL)
-        currentHole = lastHole;
+                firstHoleBeforeLast = currentHole;
+         }
 
-    while (currentHole != NULL)
-    {
-        if (currentHole->size >= processSize)
-        {
-            holeFound = true;
+        //test if the hole is large enough
+        if(currentHole->startAddress >= lastAllocatedAddress && currentHole->size >= processSize)
             break;
-        }
-        currentHole = currentHole->next;
-        validHoleCount++;
-    } 
 
-    // if it can't find a hole it starts from the first hole again
-    if (validHoleCount != holeCount && holeFound == false)
-    {
-        currentHole = firstHole;
-        while (currentHole != lastHole)
-        {
-            if (currentHole->size >= processSize)
-                break;
-            currentHole = currentHole->next;
-        }
+        currentHole = currentHole->next;
     }
 
-    // modify the lastHole position
-    if(currentHole!=NULL && currentHole->next!=NULL)
-		lastHole = lastHole->next;
-	else
-		lastHole = firstHole;
 
-    // if it was not found return null
-    if (currentHole == NULL)
+    //if there was no hole found before and after the lastAllocatedAddress it means that there is no large enough hole
+    if(currentHole==NULL && firstHoleBeforeLast==NULL)
         return NULL;
+    
+    // if there is no hole after the last allocated address then the proper hole is firstHoleBeforeLast
+    if(currentHole==NULL)
+        currentHole = firstHoleBeforeLast;
 
-    //printf("%d  %d\n",holeCount,validHoleCount);
+    // update the last allocated address
+    lastAllocatedAddress = currentHole->startAddress;
+    
     // Object Allocation
     struct Block *newObject = AllocMemory(currentHole, processSize);
 
