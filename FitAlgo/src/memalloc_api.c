@@ -202,8 +202,8 @@ struct Block *AllocMemory(struct Block *currentHole, size_t processSize)
     // needed blocks
     struct Block *previousHole = currentHole->previous;
     struct Block *nextHole = currentHole->next;
-    struct Block *previousObject;
-    struct Block *nextObject;
+    struct Block *previousObject = NULL;
+    struct Block *nextObject = NULL;
 
     // modify or delete current Hole
 

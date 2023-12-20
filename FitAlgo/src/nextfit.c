@@ -14,10 +14,7 @@ extern void *memory;
 // this needs to be fixed
 struct Block *NextFit(size_t processSize)
 {
-
     static size_t lastAllocatedAddress = 0;
-
-
 
     // number of holes
     size_t holeCount = 0;
@@ -48,7 +45,6 @@ struct Block *NextFit(size_t processSize)
 
         currentHole = currentHole->next;
     }
-
 
     //if there was no hole found before and after the lastAllocatedAddress it means that there is no large enough hole
     if(currentHole==NULL && firstHoleBeforeLast==NULL)

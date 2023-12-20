@@ -52,6 +52,8 @@ int main()
     
     blk[5] = FirstFit(40);
     blk[6] = FirstFit(20);
+    for(int i=7;i<100;i++)
+        blk[i] = NextFit(20);
 
 
     printf("\n\n\nObjects\n\n");

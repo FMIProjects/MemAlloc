@@ -27,7 +27,6 @@ struct Block *FirstFit(size_t processSize)
     if (currentHole == NULL)
         return NULL;
 
-        printf("A\n");
     // Object Allocation
     struct Block *newObject = AllocMemory(currentHole, processSize);
 
