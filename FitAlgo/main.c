@@ -67,12 +67,20 @@ int main()
     FreeMemory(blk[1]);
     FreeMemory(blk[2]);
     blk[4] = BestFit(40);
+    */
+
+    /* WorstFit Example*/
+    struct Block *blk[100];
+    blk[0] = WorstFit(150);
+    blk[1] = WorstFit(100);
+    blk[2] = WorstFit(150);
+    FreeMemory(blk[1]);
+    blk[3] = WorstFit(50);
 
     printf("\n\n\nObjects\n\n");
     PrintBlock(firstObject);
     printf("\n\n\nHoles\n\n");
     PrintBlock(firstHole);
-    */
 
     free(memory);
     exit(0);
