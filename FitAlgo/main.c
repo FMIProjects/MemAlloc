@@ -38,7 +38,7 @@ int main()
     FreeMemory(blk[2]);
     */
 
-    /* Next Fit Example*/
+    /* Next Fit Example
     struct Block* blk[100];
 
     blk[0] = FirstFit(150);
@@ -49,17 +49,30 @@ int main()
     blk[3] = NextFit(100);
     blk[4] = NextFit(25);
 
-    
+
     blk[5] = FirstFit(40);
     blk[6] = FirstFit(20);
     for(int i=7;i<100;i++)
         blk[i] = NextFit(20);
+    */
 
+    /* BestFit Example*/
+    /*struct Block *blk[100];
+    blk[0] = BestFit(150);
+    blk[1] = BestFit(150);
+    blk[5] = BestFit(25);
+    blk[2] = BestFit(50);
+    blk[3] = BestFit(150);
+
+    FreeMemory(blk[1]);
+    FreeMemory(blk[2]);
+    blk[4] = BestFit(40);
 
     printf("\n\n\nObjects\n\n");
     PrintBlock(firstObject);
     printf("\n\n\nHoles\n\n");
     PrintBlock(firstHole);
+    */
 
     free(memory);
     exit(0);
