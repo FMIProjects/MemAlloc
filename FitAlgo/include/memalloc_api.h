@@ -20,6 +20,9 @@ void *AllocMainBlock();
 // Method to generate random objects
 void GenerateRandomSizes(size_t *array);
 
+// Method to allocate all sizes in the given array using the given algorithm
+void AllocateSizes(size_t *array, const char * const Algo);
+
 // Method to print the contents of a block
 void PrintBlock(struct Block *block);
 

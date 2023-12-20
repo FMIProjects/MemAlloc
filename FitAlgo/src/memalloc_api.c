@@ -1,7 +1,9 @@
 #include "../include/memalloc_api.h"
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <string.h>
 
 //--------------------------- Declarations --------------------------------//
 
@@ -27,12 +29,39 @@ void *AllocMainBlock()
 void GenerateRandomSizes(size_t *array)
 {
     srand(time(NULL));
-    for (int i = 0; i < OBJECTNUMBER; i++)
+    for (int i = 0; i < OBJECTNUMBER; ++i)
     {
         // Generate a random size for each object [1,1024] bytes
         size_t objectSize = (rand() % 1024) + 1;
         array[i] = objectSize;
     }
+}
+
+
+void AllocateSizes(size_t *array, const char * const Algo){
+    
+    char algorithmName[20];
+    strcpy(algorithmName,Algo);
+    
+
+    for(int i=0; i<OBJECTNUMBER; ++i){
+        
+        if(stricmp(algorithmName, "firstfit")==0)
+            FirstFit(array[i]);
+
+        else if(stricmp(algorithmName, "nextfit")==0)
+            NextFit(array[i]);
+        
+        else if(stricmp(algorithmName, "bestfit")==0)
+            BestFit(array[i]);
+
+        else if(stricmp(algorithmName, "worstfit")==0)
+            WorstFit(array[i]);
+
+        else return;
+
+    }
+
 }
 
 void PrintBlock(struct Block *block)

@@ -70,18 +70,22 @@ int main()
     */
 
     /* WorstFit Example*/
-    struct Block *blk[100];
-    blk[0] = WorstFit(150);
-    blk[1] = WorstFit(100);
-    blk[2] = WorstFit(150);
-    FreeMemory(blk[1]);
-    blk[3] = WorstFit(50);
+    // struct Block *blk[100];
+    // blk[0] = WorstFit(150);
+    // blk[1] = WorstFit(100);
+    // blk[2] = WorstFit(150);
+    // FreeMemory(blk[1]);
+    // blk[3] = WorstFit(50);
+
+    AllocateSizes(vSizesToAllocate,"WorstfIT");
 
     printf("\n\n\nObjects\n\n");
     PrintBlock(firstObject);
     printf("\n\n\nHoles\n\n");
     PrintBlock(firstHole);
 
+
+    
     free(memory);
     exit(0);
 }
