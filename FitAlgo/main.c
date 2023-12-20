@@ -77,7 +77,11 @@ int main()
     // FreeMemory(blk[1]);
     // blk[3] = WorstFit(50);
 
-    AllocateSizes(vSizesToAllocate,"WorstfIT");
+    // AllocateSizes(vSizesToAllocate,"WorstfIT");
+
+    RandomFit(2000);
+    RandomFit(60);
+    RandomFit(1);
 
     printf("\n\n\nObjects\n\n");
     PrintBlock(firstObject);

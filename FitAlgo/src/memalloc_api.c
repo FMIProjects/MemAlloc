@@ -28,13 +28,19 @@ void *AllocMainBlock()
 
 void GenerateRandomSizes(size_t *array)
 {
-    srand(time(NULL));
+
+    static unsigned int seed=0;
+
+    srand(time(NULL)+seed);
+
     for (int i = 0; i < OBJECTNUMBER; ++i)
     {
         // Generate a random size for each object [1,1024] bytes
         size_t objectSize = (rand() % 1024) + 1;
         array[i] = objectSize;
     }
+
+    seed+=700119;
 }
 
 
@@ -85,7 +91,42 @@ void PrintBlock(struct Block *block)
     }
 }
 
-//------------------------------ Free/Alloc Methods -----------------------//
+//------------------------------ Free/Alloc/RandomFit Methods -----------------------//
+
+struct Block* RandomFit(size_t processSize){
+    
+    static unsigned int seed = 0;
+
+    srand(time(NULL)+seed);
+
+    int FitIndex = rand()%4+1;
+    
+    seed+= 100937;
+
+    switch(FitIndex){
+
+        case 1:
+            printf("first\n");
+            return FirstFit(processSize);
+
+        case 2:
+            printf("next\n");
+            return NextFit(processSize);
+        
+        case 3:
+            printf("worst\n");
+            return WorstFit(processSize);
+        
+        case 4:
+            printf("best\n");
+            return BestFit(processSize);
+
+        default:
+            return NULL; 
+    }
+    
+
+}
 
 void FreeMemory(struct Block *object)
 {

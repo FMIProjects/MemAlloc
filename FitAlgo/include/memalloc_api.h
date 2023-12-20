@@ -38,5 +38,6 @@ struct Block *FirstFit(size_t processSize);
 struct Block *BestFit(size_t processSize);
 struct Block *NextFit(size_t processSize);
 struct Block *WorstFit(size_t processSize);
+struct Block *RandomFit(size_t processSize);
 
 #endif
