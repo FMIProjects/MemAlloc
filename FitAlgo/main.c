@@ -37,6 +37,7 @@ int main()
     printf("\n\n\nHoles\n\n");
     PrintBlock(firstHole);
 
+    printf("%d\n" ,ValidateBlocks());
     
     free(memory);
     exit(0);
