@@ -19,6 +19,9 @@
 // Method to allocate main block to heap
 void *AllocMainBlock();
 
+// Menu Method
+int Menu();
+
 // Method to generate random objects
 void GenerateRandomSizes(size_t *array);
 
@@ -26,7 +29,7 @@ void GenerateRandomSizes(size_t *array);
 void AllocateSizes(size_t *array, const char * const Algo);
 
 // Method to random allocate/free all sizes in the given array using the given algorithm
-void RandomAllocFree(size_t *array, const char * const Algo);
+void RandomAllocFree(size_t *array,int Algo);
 
 // Method to print the contents of a block
 void PrintBlock(struct Block *block);

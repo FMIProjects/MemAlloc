@@ -43,14 +43,11 @@ void GenerateRandomSizes(size_t *array)
     seed += 700119;
 }
 
-void RandomAllocFree(size_t *array, const char *const Algo)
+void RandomAllocFree(size_t *array, int Algo)
 {
     struct Block *blk[OBJECTNUMBER];
-
-    char algorithmName[20];
-    strcpy(algorithmName, Algo);
-
     static unsigned int seed = 0;
+
     srand(time(NULL) + seed);
 
     size_t afRandom;
@@ -66,16 +63,24 @@ void RandomAllocFree(size_t *array, const char *const Algo)
 
             allocIndexRandom = (rand() % OBJECTNUMBER) + 1;
 
-            if (stricmp(algorithmName, "firstfit") == 0)
+            switch (Algo) 
+            {
+            case 1:
                 FirstFit(array[allocIndexRandom]);
-            else if (stricmp(algorithmName, "nextfit") == 0)
+                break;
+            case 2:
                 NextFit(array[allocIndexRandom]);
-            else if (stricmp(algorithmName, "bestfit") == 0)
+                break;
+            case 3:
                 BestFit(array[allocIndexRandom]);
-            else if (stricmp(algorithmName, "worstfit") == 0)
+                break;
+            case 4:
                 WorstFit(array[allocIndexRandom]);
-            else
+                break;
+            default:
                 return;
+            }
+
             indexAlloc++;
         }
         else
@@ -125,6 +130,23 @@ void PrintBlock(struct Block *block)
         currentBlock = currentBlock->next;
         ++blockNumber;
     }
+}
+
+int Menu()
+{
+    char input[10];
+    printf("Choose an algorithm by writing the designated number:\n");
+    printf("1 - FirstFit\n");
+    printf("2 - NextFit\n");
+    printf("3 - BestFit\n");
+    printf("4 - WorstFit\n");
+    printf("\n");
+    printf("Algorithm: ");
+    scanf("%s",input);
+    int algorithm = atoi(input);
+    if(algorithm > 4)
+        perror("Wrong Input!"),exit(1);
+    return algorithm; 
 }
 
 //------------------------------ Free/Alloc/RandomFit Methods -----------------------//

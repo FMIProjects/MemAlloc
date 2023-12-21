@@ -4,6 +4,8 @@
 #include <stdbool.h>
 #include "../include/memalloc_api.h"
 
+#define INT_MAX 2147483647;
+
 extern struct Block *firstHole;
 extern struct Block *firstObject;
 extern void *memory;
