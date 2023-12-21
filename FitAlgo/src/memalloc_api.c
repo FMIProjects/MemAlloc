@@ -29,9 +29,9 @@ void *AllocMainBlock()
 void GenerateRandomSizes(size_t *array)
 {
 
-    static unsigned int seed=0;
+    static unsigned int seed = 0;
 
-    srand(time(NULL)+seed);
+    srand(time(NULL) + seed);
 
     for (int i = 0; i < OBJECTNUMBER; ++i)
     {
@@ -40,34 +40,70 @@ void GenerateRandomSizes(size_t *array)
         array[i] = objectSize;
     }
 
-    seed+=700119;
+    seed += 700119;
 }
 
+void RandomAllocFree(size_t *array, const char *const Algo)
+{
+    struct Block *blk[OBJECTNUMBER];
 
-void AllocateSizes(size_t *array, const char * const Algo){
-    
     char algorithmName[20];
-    strcpy(algorithmName,Algo);
-    
+    strcpy(algorithmName, Algo);
 
-    for(int i=0; i<OBJECTNUMBER; ++i){
-        
-        if(stricmp(algorithmName, "firstfit")==0)
-            FirstFit(array[i]);
+    static unsigned int seed = 0;
+    srand(time(NULL) + seed);
 
-        else if(stricmp(algorithmName, "nextfit")==0)
-            NextFit(array[i]);
-        
-        else if(stricmp(algorithmName, "bestfit")==0)
-            BestFit(array[i]);
+    size_t afRandom;
+    size_t freeIndexRandom;
+    size_t allocIndexRandom;
+    size_t indexAlloc = 0;
 
-        else if(stricmp(algorithmName, "worstfit")==0)
-            WorstFit(array[i]);
+    for (int i = 0; i < AFNUMBER; i++)
+    {
+        afRandom = (rand() % 2) + 1;
+        if (afRandom == 1)
+        {
 
-        else return;
+            allocIndexRandom = (rand() % OBJECTNUMBER) + 1;
 
+            if (stricmp(algorithmName, "firstfit") == 0)
+                FirstFit(array[allocIndexRandom]);
+            else if (stricmp(algorithmName, "nextfit") == 0)
+                NextFit(array[allocIndexRandom]);
+            else if (stricmp(algorithmName, "bestfit") == 0)
+                BestFit(array[allocIndexRandom]);
+            else if (stricmp(algorithmName, "worstfit") == 0)
+                WorstFit(array[allocIndexRandom]);
+            else
+                return;
+            indexAlloc++;
+        }
+        else
+        {
+            if (indexAlloc != 0)
+            {
+                freeIndexRandom = (rand() % indexAlloc) + 1;
+                struct Block *currentObject = firstObject;
+                size_t currentIndex = 0;
+
+                // search into the list the first large enough hole
+                while (currentObject != NULL)
+                {
+                    currentIndex++;
+                    if (currentIndex == freeIndexRandom)
+                        break;
+                    
+                    currentObject = currentObject->next;
+                }
+
+                if(currentObject!=NULL){
+                        FreeMemory(currentObject);
+                        indexAlloc--;
+                }
+                
+            }
+        }
     }
-
 }
 
 void PrintBlock(struct Block *block)
@@ -93,43 +129,45 @@ void PrintBlock(struct Block *block)
 
 //------------------------------ Free/Alloc/RandomFit Methods -----------------------//
 
-struct Block* RandomFit(size_t processSize){
-    
+struct Block *RandomFit(size_t processSize)
+{
+
     static unsigned int seed = 0;
 
-    srand(time(NULL)+seed);
+    srand(time(NULL) + seed);
 
-    int FitIndex = rand()%4+1;
-    
-    seed+= 100937;
+    int FitIndex = rand() % 4 + 1;
 
-    switch(FitIndex){
+    seed += 100937;
 
-        case 1:
-            printf("first\n");
-            return FirstFit(processSize);
+    switch (FitIndex)
+    {
 
-        case 2:
-            printf("next\n");
-            return NextFit(processSize);
-        
-        case 3:
-            printf("worst\n");
-            return WorstFit(processSize);
-        
-        case 4:
-            printf("best\n");
-            return BestFit(processSize);
+    case 1:
+        printf("first\n");
+        return FirstFit(processSize);
 
-        default:
-            return NULL; 
+    case 2:
+        printf("next\n");
+        return NextFit(processSize);
+
+    case 3:
+        printf("worst\n");
+        return WorstFit(processSize);
+
+    case 4:
+        printf("best\n");
+        return BestFit(processSize);
+
+    default:
+        return NULL;
     }
-    
-
 }
 
 void FreeMemory(struct Block *object)
 {
+    if(object==NULL)
+        return;
 
     // obtain the previous and next objects of the object that will be deallocated
     struct Block *previousObject = object->previous;
@@ -145,8 +183,8 @@ void FreeMemory(struct Block *object)
         previousObject->next = nextObject;
 
         // modify the first object if the object to deallocate is actuallly the first object
-        if (firstObject == object)
-            firstObject = previousObject;
+        // if (firstObject == object)
+        //     firstObject = previousObject;
     }
 
     if (nextObject != NULL)
@@ -209,6 +247,7 @@ void FreeMemory(struct Block *object)
     // connect the previous hole to the deallocated object(which is a hole now)
     if (previousHole != NULL)
     {
+        
         previousHole->next = object;
         object->previous = previousHole;
 
@@ -219,6 +258,9 @@ void FreeMemory(struct Block *object)
             object->size += previousHole->size;
             object->startAddress = previousHole->startAddress;
             object->previous = previousHole->previous;
+            //!!!! this should be updated too
+            if(previousHole->previous != NULL)
+                previousHole->previous->next = object;
 
             // careful to update the firstHole
             if (previousHole == firstHole)
@@ -243,6 +285,9 @@ void FreeMemory(struct Block *object)
 
             object->size += nextHole->size;
             object->next = nextHole->next;
+            //!!!! this should be updated too
+            if(nextHole->next != NULL)
+                nextHole->next->previous = object;
 
             // careful to update the firstHole
             if (nextHole == firstHole)
@@ -293,6 +338,7 @@ struct Block *AllocMemory(struct Block *currentHole, size_t processSize)
             firstHole = nextHole;
         }
 
+        
         if (nextHole != NULL)
             nextHole->previous = previousHole;
 
@@ -317,11 +363,11 @@ struct Block *AllocMemory(struct Block *currentHole, size_t processSize)
     // using this pointer we will iterate through the object list
     struct Block *currentObject = firstObject;
 
-    // find the allocated objects that are between the current hole
+    // find the allocated objects that are between the current OBJECT
     while (currentObject != NULL)
     {
-
-        if (currentObject->startAddress < currentHole->startAddress)
+        //!!!
+        if (currentObject->startAddress < newObject->startAddress)
         {
 
             previousObject = currentObject;

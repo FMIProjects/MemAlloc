@@ -11,6 +11,8 @@
 #define OBJECTNUMBER 10000
 // Maximum number of holes that can be created
 #define MAX_HOLES 52428800
+// maximum number of allocation/deallocation operations
+#define AFNUMBER 10000
 
 //--------------------------- Methods -------------------------------//
 
@@ -22,6 +24,9 @@ void GenerateRandomSizes(size_t *array);
 
 // Method to allocate all sizes in the given array using the given algorithm
 void AllocateSizes(size_t *array, const char * const Algo);
+
+// Method to random allocate/free all sizes in the given array using the given algorithm
+void RandomAllocFree(size_t *array, const char * const Algo);
 
 // Method to print the contents of a block
 void PrintBlock(struct Block *block);

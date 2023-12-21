@@ -26,6 +26,8 @@ int main()
 
     GenerateRandomSizes(vSizesToAllocate);
 
+    RandomAllocFree(vSizesToAllocate,"worstfit");
+
     /* First Fit Example
     struct Block *blk[100];
     blk[0] = FirstFit(104857575);
@@ -79,15 +81,11 @@ int main()
 
     // AllocateSizes(vSizesToAllocate,"WorstfIT");
 
-    RandomFit(2000);
-    RandomFit(60);
-    RandomFit(1);
-
+   
     printf("\n\n\nObjects\n\n");
     PrintBlock(firstObject);
     printf("\n\n\nHoles\n\n");
     PrintBlock(firstHole);
-
 
     
     free(memory);
