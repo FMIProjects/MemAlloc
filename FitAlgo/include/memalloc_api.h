@@ -35,7 +35,7 @@ void RandomAllocFree(size_t *array,int Algo);
 void PrintBlock(struct Block *block);
 
 // Method to test if the summed sizes of all blocks are equal to MAINBLOCKSIZE 
-bool ValidateBlocks();
+int ValidateBlocks();
 
 // Custom Free Method
 void FreeMemory(struct Block *object);
