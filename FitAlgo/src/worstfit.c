@@ -14,21 +14,23 @@ struct Block *WorstFit(size_t processSize)
     struct Block *currentHole = firstHole;
     struct Block *worstHole = NULL;
 
-    size_t maxDiff = 0;
-    size_t diff = 0;
-
+    size_t maxSize = 0;
+    
     while (currentHole != NULL)
     {
-        diff = (currentHole->size - processSize);
-        if (diff > maxDiff && diff >= 0)
+
+        if(currentHole->size>=maxSize && currentHole->size>=processSize)
         {
-            maxDiff = diff;
+            maxSize = currentHole->size;
             worstHole = currentHole;
         }
         currentHole = currentHole->next;
     }
 
     currentHole = worstHole;
+
+    if(currentHole==NULL)
+        return NULL;
 
     // Object Allocation
     struct Block *newObject = AllocMemory(currentHole, processSize);

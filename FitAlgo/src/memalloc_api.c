@@ -26,6 +26,26 @@ void *AllocMainBlock()
     return memoryBlock;
 }
 
+int ValidateBlocks(){
+    size_t summedSizes=0;
+
+    struct Block* currentBlock = firstObject;
+
+    while(currentBlock!=NULL){
+        summedSizes += currentBlock->size;
+        currentBlock = currentBlock->next;
+    }
+
+    currentBlock = firstHole;
+
+    while(currentBlock!=NULL){
+        summedSizes += currentBlock->size;
+        currentBlock = currentBlock->next;
+    }
+
+    return (summedSizes==MAINBLOCKSIZE);
+}
+
 void GenerateRandomSizes(size_t *array)
 {
 
