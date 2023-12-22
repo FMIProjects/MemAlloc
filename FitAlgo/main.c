@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
-
+#include <semaphore.h>
+#include <pthread.h>
+#include <unistd.h>
 #include "include/memalloc_api.h"
 #include "include/block.h"
 
@@ -16,7 +18,7 @@ void *memory;
 int algorithm;
 
 int main()
-{
+{   
     memory = AllocMainBlock();
 
     // create the first hole which will be the whole memory
@@ -31,14 +33,14 @@ int main()
     algorithm = Menu();
 
     RandomAllocFree(vSizesToAllocate,algorithm);
-
-    printf("\n\n\nObjects\n\n");
+    
+    /*printf("\n\n\nObjects\n\n");
     PrintBlock(firstObject);
     printf("\n\n\nHoles\n\n");
     PrintBlock(firstHole);
 
     printf("%d\n" ,ValidateBlocks());
-    
+    */
     free(memory);
     exit(0);
 }

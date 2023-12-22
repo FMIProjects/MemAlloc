@@ -6,13 +6,13 @@
 //--------------------------- Defines --------------------------------//
 
 // 100 MB in B
-#define MAINBLOCKSIZE 104857600
+#define MAINBLOCKSIZE 1000000
 // Number of Objects
 #define OBJECTNUMBER 10000
 // Maximum number of holes that can be created
 #define MAX_HOLES 52428800
 // maximum number of allocation/deallocation operations
-#define AFNUMBER 10000
+#define AFNUMBER 300000
 
 //--------------------------- Methods -------------------------------//
 
@@ -21,6 +21,9 @@ void *AllocMainBlock();
 
 // Menu Method
 int Menu();
+
+// Statistics
+void *Statistics();
 
 // Method to generate random objects
 void GenerateRandomSizes(size_t *array);

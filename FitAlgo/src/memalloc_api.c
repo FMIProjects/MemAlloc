@@ -4,6 +4,9 @@
 #include <stdlib.h>
 #include <time.h>
 #include <string.h>
+#include <semaphore.h>
+#include <pthread.h>
+#include<unistd.h>
 
 //--------------------------- Declarations --------------------------------//
 
@@ -65,6 +68,7 @@ void GenerateRandomSizes(size_t *array)
 
 void RandomAllocFree(size_t *array, int Algo)
 {
+        printf("in random alloc free\n");
     struct Block *blk[OBJECTNUMBER];
     static unsigned int seed = 0;
 
@@ -74,6 +78,7 @@ void RandomAllocFree(size_t *array, int Algo)
     size_t freeIndexRandom;
     size_t allocIndexRandom;
     size_t indexAlloc = 0;
+    int signalCounter = 0;
 
     for (int i = 0; i < AFNUMBER; i++)
     {
@@ -128,6 +133,10 @@ void RandomAllocFree(size_t *array, int Algo)
                 
             }
         }
+        if (++signalCounter == 100) {
+            Statistics();
+            signalCounter = 0;
+        }
     }
 }
 
@@ -169,6 +178,23 @@ int Menu()
     return algorithm; 
 }
 
+void *Statistics()
+{
+    system("clear");
+    struct Block *currentHole = firstHole;
+    float externalFragmentation = 0;
+    int holeNumber = 0;
+    while (currentHole != NULL)
+    {
+        holeNumber++;
+        externalFragmentation += currentHole->size;
+        currentHole = currentHole->next;
+    }
+    printf("Number of holes: %d\n",holeNumber);
+    printf("External Fragmentation: %.6f KB\n",externalFragmentation/1000);
+    
+    return NULL;
+}
 //------------------------------ Free/Alloc/RandomFit Methods -----------------------//
 
 struct Block *RandomFit(size_t processSize)
