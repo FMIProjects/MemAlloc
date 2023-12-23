@@ -1,3 +1,6 @@
+# Project Specific
+bin/
+
 # Prerequisites
 *.d
 

@@ -5,20 +5,24 @@
 #include <unistd.h>
 #include "include/memalloc_api.h"
 #include "include/block.h"
+#include "include/raf_params.h"
 
 size_t vSizesToAllocate[OBJECTNUMBER];
 struct Block *firstHole = NULL;
 struct Block *firstObject = NULL;
 
-// Used for NextFit
-struct Block *lastHole = NULL;
-
 void *memory;
 
 int algorithm;
 
+// used for lock/unlock mechanism
+pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+
+// used for waking up statistics thread waiting for condition variable.
+pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
+
 int main()
-{   
+{
     memory = AllocMainBlock();
 
     // create the first hole which will be the whole memory
@@ -32,15 +36,19 @@ int main()
 
     algorithm = Menu();
 
-    RandomAllocFree(vSizesToAllocate,algorithm);
-    
-    /*printf("\n\n\nObjects\n\n");
-    PrintBlock(firstObject);
-    printf("\n\n\nHoles\n\n");
-    PrintBlock(firstHole);
+    struct RandomAllocFreeParams params = {
+        .sizes = vSizesToAllocate,
+        .algorithm = algorithm};
 
-    printf("%d\n" ,ValidateBlocks());
-    */
+    // create the threads
+    pthread_t threadRandomAllocFree, threadStatistics;
+    pthread_create(&threadRandomAllocFree, NULL, RandomAllocFree, (void *)&params);
+    pthread_create(&threadStatistics, NULL, Statistics, NULL);
+
+    // wait for threads to finish
+    pthread_join(threadRandomAllocFree, NULL);
+    pthread_join(threadStatistics, NULL);
+
     free(memory);
     exit(0);
 }

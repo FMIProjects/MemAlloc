@@ -25,38 +25,39 @@ struct Block *NextFit(size_t processSize)
     // by using this pointer we will iterate through the hole list
     struct Block *currentHole = firstHole;
 
-    struct Block *firstHoleBeforeLast =NULL;
+    struct Block *firstHoleBeforeLast = NULL;
 
     // determine the next hole after the last allocated address
     while (currentHole != NULL)
     {
         // determine the first hole before the last memory adress
         // if there is no proper hole after the last allocated address then proper hole will be firstHoleBeforeLast
-        if(firstHoleBeforeLast==NULL &&
+        if (firstHoleBeforeLast == NULL &&
             currentHole->startAddress < lastAllocatedAddress &&
-            currentHole->size >= processSize){
+            currentHole->size >= processSize)
+        {
 
-                firstHoleBeforeLast = currentHole;
-         }
+            firstHoleBeforeLast = currentHole;
+        }
 
-        //test if the hole is large enough
-        if(currentHole->startAddress >= lastAllocatedAddress && currentHole->size >= processSize)
+        // test if the hole is large enough
+        if (currentHole->startAddress >= lastAllocatedAddress && currentHole->size >= processSize)
             break;
 
         currentHole = currentHole->next;
     }
 
-    //if there was no hole found before and after the lastAllocatedAddress it means that there is no large enough hole
-    if(currentHole==NULL && firstHoleBeforeLast==NULL)
+    // if there was no hole found before and after the lastAllocatedAddress it means that there is no large enough hole
+    if (currentHole == NULL && firstHoleBeforeLast == NULL)
         return NULL;
-    
+
     // if there is no hole after the last allocated address then the proper hole is firstHoleBeforeLast
-    if(currentHole==NULL)
+    if (currentHole == NULL)
         currentHole = firstHoleBeforeLast;
 
     // update the last allocated address
     lastAllocatedAddress = currentHole->startAddress;
-    
+
     // Object Allocation
     struct Block *newObject = AllocMemory(currentHole, processSize);
 

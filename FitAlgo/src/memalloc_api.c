@@ -6,13 +6,22 @@
 #include <string.h>
 #include <semaphore.h>
 #include <pthread.h>
-#include<unistd.h>
+#include <unistd.h>
 
 //--------------------------- Declarations --------------------------------//
 
 extern struct Block *firstHole;
 extern struct Block *firstObject;
 extern void *memory;
+
+extern pthread_mutex_t mutex;
+extern pthread_cond_t cond;
+
+int signalFlag = 0;
+int randomAllocFreeFinished = 0;
+
+int allocNumber = 0;
+int freeNumber = 0;
 
 //------------------------------ Methods ----------------------------------//
 
@@ -29,24 +38,27 @@ void *AllocMainBlock()
     return memoryBlock;
 }
 
-int ValidateBlocks(){
-    size_t summedSizes=0;
+int ValidateBlocks()
+{
+    size_t summedSizes = 0;
 
-    struct Block* currentBlock = firstObject;
+    struct Block *currentBlock = firstObject;
 
-    while(currentBlock!=NULL){
+    while (currentBlock != NULL)
+    {
         summedSizes += currentBlock->size;
         currentBlock = currentBlock->next;
     }
 
     currentBlock = firstHole;
 
-    while(currentBlock!=NULL){
+    while (currentBlock != NULL)
+    {
         summedSizes += currentBlock->size;
         currentBlock = currentBlock->next;
     }
 
-    return (summedSizes==MAINBLOCKSIZE);
+    return (summedSizes == MAINBLOCKSIZE);
 }
 
 void GenerateRandomSizes(size_t *array)
@@ -66,9 +78,13 @@ void GenerateRandomSizes(size_t *array)
     seed += 700119;
 }
 
-void RandomAllocFree(size_t *array, int Algo)
+void *RandomAllocFree(void *arg)
 {
-        printf("in random alloc free\n");
+    struct RandomAllocFreeParams *params = (struct RandomAllocFreeParams *)arg;
+
+    int algo = params->algorithm;
+    size_t *array = params->sizes;
+
     struct Block *blk[OBJECTNUMBER];
     static unsigned int seed = 0;
 
@@ -78,17 +94,17 @@ void RandomAllocFree(size_t *array, int Algo)
     size_t freeIndexRandom;
     size_t allocIndexRandom;
     size_t indexAlloc = 0;
-    int signalCounter = 0;
 
     for (int i = 0; i < AFNUMBER; i++)
     {
         afRandom = (rand() % 2) + 1;
         if (afRandom == 1)
         {
+            allocNumber++;
 
             allocIndexRandom = (rand() % OBJECTNUMBER) + 1;
-
-            switch (Algo) 
+            pthread_mutex_lock(&mutex);
+            switch (algo)
             {
             case 1:
                 FirstFit(array[allocIndexRandom]);
@@ -103,41 +119,59 @@ void RandomAllocFree(size_t *array, int Algo)
                 WorstFit(array[allocIndexRandom]);
                 break;
             default:
-                return;
+                pthread_mutex_unlock(&mutex);
+                return NULL;
             }
-
             indexAlloc++;
+            pthread_mutex_unlock(&mutex);
         }
         else
         {
             if (indexAlloc != 0)
             {
+                freeNumber++;
                 freeIndexRandom = (rand() % indexAlloc) + 1;
                 struct Block *currentObject = firstObject;
                 size_t currentIndex = 0;
 
+                pthread_mutex_lock(&mutex);
                 // search into the list the first large enough hole
                 while (currentObject != NULL)
                 {
                     currentIndex++;
                     if (currentIndex == freeIndexRandom)
                         break;
-                    
+
                     currentObject = currentObject->next;
                 }
 
-                if(currentObject!=NULL){
-                        FreeMemory(currentObject);
-                        indexAlloc--;
+                if (currentObject != NULL)
+                {
+                    FreeMemory(currentObject);
+                    indexAlloc--;
                 }
-                
+                pthread_mutex_unlock(&mutex);
             }
         }
-        if (++signalCounter == 100) {
-            Statistics();
-            signalCounter = 0;
+        if (i % 100 == 0)
+        {
+            pthread_mutex_lock(&mutex);
+            // Signal the Statistics thread to print
+            signalFlag = 1;
+            pthread_cond_signal(&cond);
+            pthread_mutex_unlock(&mutex);
         }
     }
+
+    pthread_mutex_lock(&mutex);
+    randomAllocFreeFinished = 1;
+    // Signal the Statistics thread to check the flag
+    // to exit the loop
+    pthread_cond_signal(&cond);
+    pthread_mutex_unlock(&mutex);
+
+    pthread_exit(NULL);
+    return NULL;
 }
 
 void PrintBlock(struct Block *block)
@@ -171,28 +205,54 @@ int Menu()
     printf("4 - WorstFit\n");
     printf("\n");
     printf("Algorithm: ");
-    scanf("%s",input);
+
+    scanf("%s", input);
     int algorithm = atoi(input);
-    if(algorithm > 4)
-        perror("Wrong Input!"),exit(1);
-    return algorithm; 
+    if (algorithm > 4)
+        perror("Wrong Input!"), exit(1);
+    return algorithm;
 }
 
 void *Statistics()
 {
-    system("clear");
-    struct Block *currentHole = firstHole;
-    float externalFragmentation = 0;
-    int holeNumber = 0;
-    while (currentHole != NULL)
+    while (1)
     {
-        holeNumber++;
-        externalFragmentation += currentHole->size;
-        currentHole = currentHole->next;
+        pthread_mutex_lock(&mutex);
+
+        // Statistics Methos waits for a signal from RandomAllocFree Method
+        while (!signalFlag && !randomAllocFreeFinished)
+        {
+            pthread_cond_wait(&cond, &mutex);
+        }
+        // reset the signal to wait again for another
+        signalFlag = 0;
+        pthread_mutex_unlock(&mutex);
+
+        // if RandomAllocFree finished we close the statistics thread
+        if (randomAllocFreeFinished)
+            break;
+
+        // Statistics Logic
+        system("clear");
+        struct Block *currentHole = firstHole;
+        float externalFragmentation = 0;
+        int holeNumber = 0;
+
+        while (currentHole != NULL)
+        {
+            holeNumber++;
+            externalFragmentation += currentHole->size;
+            currentHole = currentHole->next;
+        }
+
+        printf("Number of allocs: %d\n", allocNumber);
+        printf("Number of frees: %d\n", freeNumber);
+        printf("Number of holes: %d\n", holeNumber);
+        printf("External Fragmentation: %.6f KB\n", externalFragmentation / 1000);
+        // End of Statistics Logic
     }
-    printf("Number of holes: %d\n",holeNumber);
-    printf("External Fragmentation: %.6f KB\n",externalFragmentation/1000);
-    
+
+    pthread_exit(NULL);
     return NULL;
 }
 //------------------------------ Free/Alloc/RandomFit Methods -----------------------//
@@ -234,7 +294,7 @@ struct Block *RandomFit(size_t processSize)
 
 void FreeMemory(struct Block *object)
 {
-    if(object==NULL)
+    if (object == NULL)
         return;
 
     // obtain the previous and next objects of the object that will be deallocated
@@ -315,7 +375,7 @@ void FreeMemory(struct Block *object)
     // connect the previous hole to the deallocated object(which is a hole now)
     if (previousHole != NULL)
     {
-        
+
         previousHole->next = object;
         object->previous = previousHole;
 
@@ -327,7 +387,7 @@ void FreeMemory(struct Block *object)
             object->startAddress = previousHole->startAddress;
             object->previous = previousHole->previous;
             //!!!! this should be updated too
-            if(previousHole->previous != NULL)
+            if (previousHole->previous != NULL)
                 previousHole->previous->next = object;
 
             // careful to update the firstHole
@@ -354,7 +414,7 @@ void FreeMemory(struct Block *object)
             object->size += nextHole->size;
             object->next = nextHole->next;
             //!!!! this should be updated too
-            if(nextHole->next != NULL)
+            if (nextHole->next != NULL)
                 nextHole->next->previous = object;
 
             // careful to update the firstHole
@@ -406,7 +466,6 @@ struct Block *AllocMemory(struct Block *currentHole, size_t processSize)
             firstHole = nextHole;
         }
 
-        
         if (nextHole != NULL)
             nextHole->previous = previousHole;
 

@@ -32,9 +32,9 @@ struct Block *BestFit(size_t processSize)
 
     currentHole = bestHole;
 
-    if(currentHole == NULL)
+    if (currentHole == NULL)
         return NULL;
-    
+
     // Object Allocation
     struct Block *newObject = AllocMemory(currentHole, processSize);
 
