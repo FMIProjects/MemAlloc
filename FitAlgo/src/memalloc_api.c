@@ -7,6 +7,7 @@
 #include <semaphore.h>
 #include <pthread.h>
 #include <unistd.h>
+#include <time.h>
 
 //--------------------------- Declarations --------------------------------//
 
@@ -22,6 +23,11 @@ int randomAllocFreeFinished = 0;
 
 int allocNumber = 0;
 int freeNumber = 0;
+
+//used for measuring CPU time
+clock_t start;
+clock_t end;
+
 
 //------------------------------ Methods ----------------------------------//
 
@@ -80,6 +86,8 @@ void GenerateRandomSizes(size_t *array)
 
 void *RandomAllocFree(void *arg)
 {
+    start = clock();
+
     struct RandomAllocFreeParams *params = (struct RandomAllocFreeParams *)arg;
 
     int algo = params->algorithm;
@@ -153,10 +161,11 @@ void *RandomAllocFree(void *arg)
                 pthread_mutex_unlock(&mutex);
             }
         }
-        if (i % 100 == 0)
+        if (i % 1000 == 0)
         {
             pthread_mutex_lock(&mutex);
             // Signal the Statistics thread to print
+            end = clock();
             signalFlag = 1;
             pthread_cond_signal(&cond);
             pthread_mutex_unlock(&mutex);
@@ -197,15 +206,25 @@ void PrintBlock(struct Block *block)
 
 int Menu()
 {
+    system("clear");
+    printf(RED"    ______ _ _            _             \n");
+    printf("   |  ____(_) |     /\\   | |            \n");
+    printf("   | |__   _| |_   /  \\  | | __ _  ___  \n");
+    printf("   |  __| | | __| / /\\ \\ | |/ _` |/ _ \\ \n");
+    printf("   | |    | | |_ / ____ \\| | (_| | (_) |\n");
+    printf("   |_|    |_|\\__/_/    \\_\\_|\\__, |\\___/ \n");
+    printf("                             __/ |      \n");
+    printf("                            |___/       \n"CRESET);
     char input[10];
-    printf("Choose an algorithm by writing the designated number:\n");
-    printf("1 - FirstFit\n");
-    printf("2 - NextFit\n");
-    printf("3 - BestFit\n");
-    printf("4 - WorstFit\n");
-    printf("\n");
+    printf("=============================================\n");
+    printf("Choose a memory allocation algorithm:\n");
+    printf("=============================================\n");
+    printf(BLU"1 - First Fit\n");
+    printf("2 - Next Fit\n");
+    printf("3 - Best Fit\n");
+    printf("4 - Worst Fit\n" CRESET);
+    printf("=============================================\n");
     printf("Algorithm: ");
-
     scanf("%s", input);
     int algorithm = atoi(input);
     if (algorithm > 4)
@@ -226,6 +245,7 @@ void *Statistics()
         }
         // reset the signal to wait again for another
         signalFlag = 0;
+        double elapsed = ((double)(end - start)) / CLOCKS_PER_SEC;
         pthread_mutex_unlock(&mutex);
 
         // if RandomAllocFree finished we close the statistics thread
@@ -245,10 +265,14 @@ void *Statistics()
             currentHole = currentHole->next;
         }
 
-        printf("Number of allocs: %d\n", allocNumber);
-        printf("Number of frees: %d\n", freeNumber);
-        printf("Number of holes: %d\n", holeNumber);
-        printf("External Fragmentation: %.6f KB\n", externalFragmentation / 1000);
+        printf("Memory Statistics:\n");
+        printf("=========================================\n");
+        printf(BLU"Number of allocations: %d\n", allocNumber);
+        printf("Number of deallocations: %d\n", freeNumber);
+        printf("Number of holes: %d\n"CRESET, holeNumber);
+        printf(RED"External Fragmentation: %.6f KB\n"CRESET, externalFragmentation / 1000);
+        printf(YEL"CPU Time: %.3f seconds\n"CRESET, elapsed);
+        printf("=========================================\n");
         // End of Statistics Logic
     }
 

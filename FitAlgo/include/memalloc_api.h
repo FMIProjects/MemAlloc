@@ -3,7 +3,7 @@
 
 #include "block.h"
 #include "raf_params.h"
-
+#include "colors.h"
 //--------------------------- Defines --------------------------------//
 
 // 100 MB in B
