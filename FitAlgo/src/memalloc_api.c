@@ -265,6 +265,8 @@ void *Statistics()
             currentHole = currentHole->next;
         }
 
+        // pthread_mutex_unlock(&mutex);    
+
         printf("Memory Statistics:\n");
         printf("=========================================\n");
         printf(BLU"Number of allocations: %d\n", allocNumber);

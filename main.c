@@ -41,10 +41,10 @@ int main()
 
     pid_t pid;
 
-    switch (pid = fork())
+    switch (pid = vfork())
     {
     case -1:
-        perror("fork");
+        perror("vfork");
         exit(1);
 
     case 0:
