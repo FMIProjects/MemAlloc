@@ -9,7 +9,8 @@ mkdir -p BuddySystem/bin
 gcc -o FitAlgo/bin/fitalgo FitAlgo/main.c FitAlgo/src/*.c
 
 # Compile BuddySystem
-# TBA
+
+gcc -o BuddySystem/bin/buddysystem BuddySystem/main.c BuddySystem/src/*.c
 
 # Compile main
 gcc -o bin/main main.c

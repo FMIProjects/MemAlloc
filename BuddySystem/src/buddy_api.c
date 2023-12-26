@@ -25,4 +25,5 @@ int buddyInit(size_t size, size_t low, size_t high){
     minimumSize = low;
     maximumSize = high;
 
+    return 0;
 }

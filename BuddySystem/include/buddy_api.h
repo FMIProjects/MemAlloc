@@ -16,6 +16,8 @@
 
 //--------------------------- Methods -------------------------------//
 
+// Method used for buddy init
 int isPowerOfTwo(size_t n);
 
+// Method used to initialise the size and bounds of the allocator 
 int buddyInit(size_t size, size_t low, size_t high);
