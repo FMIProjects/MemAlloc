@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <limits.h>
 
 //--------------------------- Declarations --------------------------------//
 
@@ -54,6 +55,53 @@ int buddyInit(size_t size, size_t low, size_t high){
     return 0;
 }
 
+int partitionHole(struct BuddyBlock* chosenHole, int stopOrder){
+
+    if(chosenHole==NULL || stopOrder>= chosenHole->order)
+        return -1;
+
+    struct BuddyBlock* previousHole = chosenHole->previous;
+    struct BuddyBlock* nextHole = chosenHole->next;
+
+    struct BuddyBlock* newHole = NULL;
+    struct BuddyBlock* currentHole = chosenHole;
+
+    while(currentHole->order != stopOrder){
+
+        
+        //create a newHole
+        newHole = (struct BuddyBlock*)malloc(sizeof(struct BuddyBlock));
+        newHole->startAddress = currentHole->startAddress;
+        newHole->size = currentHole->size >> 1;
+        newHole->next = currentHole;
+        newHole->previous = NULL;
+        newHole-> order = currentHole->order -1;
+
+        //split the current Hole into half
+        currentHole->size = currentHole->size >>1;
+        currentHole-> previous = newHole;
+        currentHole-> order -=1;
+        currentHole->startAddress += currentHole->size;
+
+        currentHole = newHole;
+    }
+
+    // connect the new Hole to the previous hole of the now split chosen hole
+    newHole->previous = previousHole;
+
+    // also connect the previous Hole to the newHOle
+    if(previousHole != NULL)
+        previousHole->next= newHole;
+
+    // also get back the firstHole
+
+    while(firstHole->previous != NULL)
+        firstHole = firstHole -> previous;
+
+    return 1;
+
+}
+
 struct BuddyBlock* BuddyAlloc(size_t size){
 
     int currentOrder = calculateOrder(size, minimumSize);
@@ -80,8 +128,14 @@ struct BuddyBlock* BuddyAlloc(size_t size){
         if(previousHole != NULL)
             previousHole->next = nextHole;
         
-        if(nextHole != NULL)
+        if(nextHole != NULL){
             nextHole->previous = previousHole;
+        }
+
+        // update the firstHole if necessary
+        if(currentHole==firstHole)
+            firstHole = nextHole;
+           
 
         //sanitise the currentHole, it will become an Object
 
@@ -137,10 +191,34 @@ struct BuddyBlock* BuddyAlloc(size_t size){
     // we need to find the last hole that has the minimum order that is bigger than the order of the current object
 
 
-    // we reuse the currentHole pointer to iterate through 
+    struct BuddyBlock* chosenHole = NULL;
+
+    // we reuse the currentHole pointer to iterate through the holes
     currentHole=firstHole;
+    int minOrder = INT_MAX;
+
+    while(currentHole!=NULL){
+        
+        // look for the last hole with the minimum order that is bigger than the order of the current object
+        if(minOrder <= currentHole->order && currentHole->order > currentOrder){
+
+            minOrder = currentHole -> order;
+            chosenHole = currentHole;
+        }
+        
+        currentHole= currentHole->next;
+
+    }
+
+    // if the memory is overloaded and cannot have a block of the given size return null
+    if(chosenHole == NULL)
+        return NULL;
+
+    // if we have found a Hole we need to start split it into partitons with lower orders till we get one with the order equal to the current order
 
 }
+
+
 
 void PrintBlock(struct BuddyBlock *block)
 {

@@ -20,7 +20,10 @@ int main()
         exit(EXIT_FAILURE);
     }
     
-    printf("%d\n", calculateOrder(1, 5));
+    partitionHole(firstHole, 0);
+
+    PrintBlock(firstObject);
+    PrintBlock(firstHole);
 
     exit(0);
 }
