@@ -19,6 +19,18 @@ int isPowerOfTwo(size_t n){
     return (n > 0) && ( (n & (n-1)) == 0);
 }
 
+int calculateOrder(size_t size, size_t low){
+
+    int order=0;
+
+    while((order+1)*low < size)
+        ++order;
+
+    return order;
+    
+}
+
+
 int buddyInit(size_t size, size_t low, size_t high){
 
     if (!( isPowerOfTwo(size) && isPowerOfTwo(low) && isPowerOfTwo(high)) )
@@ -38,4 +50,10 @@ int buddyInit(size_t size, size_t low, size_t high){
     firstHole->order = log2((double)size/low);
 
     return 0;
+}
+
+struct BuddyBlock* BuddyAlloc(size_t size){
+
+    int currentOrder = calculateOrder(size, minimumSize);
+    
 }
