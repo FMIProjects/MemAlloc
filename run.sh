@@ -10,7 +10,7 @@ gcc -o FitAlgo/bin/fitalgo FitAlgo/main.c FitAlgo/src/*.c
 
 # Compile BuddySystem
 
-gcc -o BuddySystem/bin/buddysystem BuddySystem/main.c BuddySystem/src/*.c
+gcc -o BuddySystem/bin/buddysystem BuddySystem/main.c BuddySystem/src/*.c -lm
 
 # Compile main
 gcc -o bin/main main.c
