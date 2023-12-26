@@ -25,5 +25,7 @@ int main()
     PrintBlock(firstObject);
     PrintBlock(firstHole);
 
+    printf("%d\n", ValidateBlocks());
+
     exit(0);
 }

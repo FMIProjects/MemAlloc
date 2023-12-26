@@ -32,3 +32,5 @@ struct BuddyBlock* BuddyAlloc(size_t size);
 
 // Method used to print the whole Objects or Holes
 void PrintBlock(struct BuddyBlock *block);
+// Method used to test if the sizes of the objects and holes are valid 
+int ValidateBlocks();

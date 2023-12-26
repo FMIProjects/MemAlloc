@@ -270,3 +270,26 @@ void PrintBlock(struct BuddyBlock *block)
     } 
 
 }
+
+int ValidateBlocks()
+{
+    size_t summedSizes = 0;
+
+    struct BuddyBlock *currentBlock = firstObject;
+
+    while (currentBlock != NULL)
+    {
+        summedSizes += (1<<currentBlock->order) * minimumSize;
+        currentBlock = currentBlock->next;
+    }
+
+    currentBlock = firstHole;
+
+    while (currentBlock != NULL)
+    {
+        summedSizes += currentBlock->size;
+        currentBlock = currentBlock->next;
+    }
+
+    return (summedSizes == maxMemorySize);
+}
