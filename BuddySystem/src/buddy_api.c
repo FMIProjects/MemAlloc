@@ -32,7 +32,7 @@ int calculateOrder(size_t size, size_t low){
 }
 
 
-int buddyInit(size_t size, size_t low, size_t high){
+int BuddyInit(size_t size, size_t low, size_t high){
 
     // if the sizes are not of power of 2 return -1
     if (!( isPowerOfTwo(size) && isPowerOfTwo(low) && isPowerOfTwo(high)) )
@@ -55,10 +55,10 @@ int buddyInit(size_t size, size_t low, size_t high){
     return 0;
 }
 
-int partitionHole(struct BuddyBlock* chosenHole, int stopOrder){
-
+struct BuddyBlock* partitionHole(struct BuddyBlock* chosenHole, int stopOrder){
+    
     if(chosenHole==NULL || stopOrder>= chosenHole->order)
-        return -1;
+        return NULL;
 
     struct BuddyBlock* previousHole = chosenHole->previous;
     struct BuddyBlock* nextHole = chosenHole->next;
@@ -98,14 +98,17 @@ int partitionHole(struct BuddyBlock* chosenHole, int stopOrder){
     while(firstHole->previous != NULL)
         firstHole = firstHole -> previous;
 
-    return 1;
+    return newHole;
 
 }
 
 struct BuddyBlock* BuddyAlloc(size_t size){
 
-    int currentOrder = calculateOrder(size, minimumSize);
+    if(size > maximumSize)
+        return NULL;
 
+    int currentOrder = calculateOrder(size, minimumSize);
+    
     // by using this pointer we will iterate through the hole blocks
     struct BuddyBlock* currentHole = firstHole;
 
@@ -118,81 +121,13 @@ struct BuddyBlock* BuddyAlloc(size_t size){
         currentHole = currentHole-> next;
     }
 
-    // case when there is a suitable hole
-    if(currentHole!=NULL){
-        
-        // connect the next and previous holes if they exist
-        struct BuddyBlock* nextHole = currentHole->next;
-        struct BuddyBlock* previousHole = currentHole->previous;
-
-        if(previousHole != NULL)
-            previousHole->next = nextHole;
-        
-        if(nextHole != NULL){
-            nextHole->previous = previousHole;
-        }
-
-        // update the firstHole if necessary
-        if(currentHole==firstHole)
-            firstHole = nextHole;
-           
-
-        //sanitise the currentHole, it will become an Object
-
-        currentHole->previous = NULL;
-        currentHole->next = NULL;
-        currentHole->size = size; 
-
-        // case when there is no first object
-        if(firstObject==NULL){
-            firstObject = currentHole;
-            return firstObject;
-        }
-
-        //case when the objects need to be connected to other objects
-
-        struct BuddyBlock* nextObject;
-        struct BuddyBlock* previousObject;
-        struct BuddyBlock* currentObject = firstObject;
-
-        // we will find the suitable objects by comparing strat addresses
-
-        while(currentObject!= NULL){
-
-            if(currentObject->startAddress < currentHole->startAddress){
-
-                previousObject = currentObject;
-                nextObject = currentObject->next;
-            }
-            else{
-
-                nextObject = currentObject;
-                break;
-            }
-
-            currentObject = currentObject->next;
-        }
-
-        // connect the allocated object ( currentHole ) to the found objects ifn they exist
-        if(previousObject != NULL){
-
-            previousObject->next = currentHole;
-            currentHole->previous = previousObject;
-        }
-
-        if(nextObject != NULL){
-
-            currentHole->next = nextObject;
-            nextObject->previous = currentHole; 
-        }
-    }
-
     // case when there is no suitable hole
     // we need to find the last hole that has the minimum order that is bigger than the order of the current object
-
-
+    if(currentHole==NULL){
+    
+    
     struct BuddyBlock* chosenHole = NULL;
-
+    
     // we reuse the currentHole pointer to iterate through the holes
     currentHole=firstHole;
     int minOrder = INT_MAX;
@@ -200,7 +135,7 @@ struct BuddyBlock* BuddyAlloc(size_t size){
     while(currentHole!=NULL){
         
         // look for the last hole with the minimum order that is bigger than the order of the current object
-        if(minOrder <= currentHole->order && currentHole->order > currentOrder){
+        if(minOrder >= currentHole->order && currentHole->order > currentOrder){
 
             minOrder = currentHole -> order;
             chosenHole = currentHole;
@@ -216,6 +151,81 @@ struct BuddyBlock* BuddyAlloc(size_t size){
 
     // if we have found a Hole we need to start split it into partitons with lower orders till we get one with the order equal to the current order
 
+    currentHole = partitionHole(chosenHole, currentOrder);
+    }
+
+
+
+    // case when there is a suitable hole
+    
+        
+    // connect the next and previous holes if they exist
+    struct BuddyBlock* nextHole = currentHole->next;
+    struct BuddyBlock* previousHole = currentHole->previous;
+
+    if(previousHole != NULL)
+        previousHole->next = nextHole;
+    
+    if(nextHole != NULL){
+        nextHole->previous = previousHole;
+    }
+
+    // update the firstHole if necessary
+    if(currentHole==firstHole)
+        firstHole = nextHole;
+        
+
+    //sanitise the currentHole, it will become an Object
+
+    currentHole->previous = NULL;
+    currentHole->next = NULL;
+    currentHole->size = size; 
+
+    // case when there is no first object
+    if(firstObject==NULL){
+        firstObject = currentHole;
+        return firstObject;
+    }
+
+    //case when the objects need to be connected to other objects
+
+    struct BuddyBlock* nextObject;
+    struct BuddyBlock* previousObject;
+    struct BuddyBlock* currentObject = firstObject;
+
+    // we will find the suitable objects by comparing strat addresses
+
+    while(currentObject!= NULL){
+
+        if(currentObject->startAddress < currentHole->startAddress){
+
+            previousObject = currentObject;
+            nextObject = currentObject->next;
+        }
+        else{
+
+            nextObject = currentObject;
+            break;
+        }
+
+        currentObject = currentObject->next;
+    }
+
+    // connect the allocated object ( currentHole ) to the found objects ifn they exist
+    if(previousObject != NULL){
+
+        previousObject->next = currentHole;
+        currentHole->previous = previousObject;
+    }
+
+    if(nextObject != NULL){
+
+        currentHole->next = nextObject;
+        nextObject->previous = currentHole; 
+    }
+
+    return currentHole;
+    
 }
 
 

@@ -14,15 +14,22 @@ struct BuddyBlock* firstObject;
 int main()
 {
 
-    if(buddyInit(MAINBLOCKSIZE, MINIMUMSIZE , MAXIMUMSIZE )){
+    if(BuddyInit(MAINBLOCKSIZE, MINIMUMSIZE , MAXIMUMSIZE )){
 
         perror("Invalid allocator parameters\n\a");
         exit(EXIT_FAILURE);
     }
     
-    partitionHole(firstHole, 0);
+    // printf("%p\n",firstHole);
+    // printf("%p\n",firstObject);
 
+    // partitionHole(firstHole, 0);
+
+    
+    BuddyAlloc(16000);
+    BuddyAlloc(1200);
     PrintBlock(firstObject);
+    printf("\n");
     PrintBlock(firstHole);
 
     printf("%d\n", ValidateBlocks());

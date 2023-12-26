@@ -22,10 +22,10 @@ int isPowerOfTwo(size_t n);
 int calculateOrder(size_t size, size_t low);
 
 // Method used to initialise the size and bounds of the allocator 
-int buddyInit(size_t size, size_t low, size_t high);
+int BuddyInit(size_t size, size_t low, size_t high);
 
-// Method used to partition of hole till one the order equal to stopOrder is found
-int partitionHole(struct BuddyBlock* chosenHole, int stopOrder);
+// Method used to partition of hole till one the order equal to stopOrder is found, returns the first Hole with the order equal to stopOrder
+struct BuddyBlock* partitionHole(struct BuddyBlock* chosenHole, int stopOrder);
 
 // Method used to allocate memory using the buddy system
 struct BuddyBlock* BuddyAlloc(size_t size);
