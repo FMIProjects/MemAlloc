@@ -30,6 +30,12 @@ struct BuddyBlock* partitionHole(struct BuddyBlock* chosenHole, int stopOrder);
 // Method used to allocate memory using the buddy system
 struct BuddyBlock* BuddyAlloc(size_t size);
 
+// Method used to merge the given hole with the holes on the right if they can be merged
+struct BuddyBlock* MergeHoles ( struct BuddyBlock* hole , struct BuddyBlock* nextObject);
+
+// Method used to deallocate memory from the buddy system
+void FreeBuddyMemory(struct BuddyBlock* object);
+
 // Method used to print the whole Objects or Holes
 void PrintBlock(struct BuddyBlock *block);
 // Method used to test if the sizes of the objects and holes are valid 

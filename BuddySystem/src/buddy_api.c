@@ -154,11 +154,8 @@ struct BuddyBlock* BuddyAlloc(size_t size){
     currentHole = partitionHole(chosenHole, currentOrder);
     }
 
-
-
     // case when there is a suitable hole
     
-        
     // connect the next and previous holes if they exist
     struct BuddyBlock* nextHole = currentHole->next;
     struct BuddyBlock* previousHole = currentHole->previous;
@@ -228,7 +225,79 @@ struct BuddyBlock* BuddyAlloc(size_t size){
     
 }
 
+/*
+ -in order to merge a given hole it needs to have at least 1 neighbour hole of the same order
+ -in order to merge 2 holes they need to be pairs 
+ -one hole makes a pair with the hole that is in its right if the number of neighbouring blocks of the same order as the current hole in the right is odd
+-one hole makes a pair with the hole that is in its left if the number of neighbouring blocks of the same order as the current hole in the right is even
+*/
+struct BuddyBlock* MergeHoles ( struct BuddyBlock* hole , struct BuddyBlock* nextObject){
+    int numberHolesSameOrder = 0;
 
+    struct BuddyBlock* currentHole= hole;
+    struct BuddyBlock* currentObject = nextObject;
+}
+
+void FreeBuddyMemory(struct BuddyBlock* object){
+
+    // get the next and previous objects and connect them if they exist
+
+    struct BuddyBlock* previousObject = object->previous;
+    struct BuddyBlock* nextObject = object->next;
+
+    if(previousObject!=NULL)
+        previousObject->next = nextObject;
+
+    if(nextObject!=NULL)
+        nextObject->previous = previousObject;
+
+    // case when the object to deallocate is the first object
+    if(object==firstObject)
+        firstObject = nextObject;
+
+    // it is safe to sanitize the object since it will become a hole
+    object->next = NULL;
+    object->previous = NULL;
+    // the size becomes the full size of the block
+    object->size = (1<< object->order) * minimumSize;
+    
+    // find the 2 holes between the object to deallocate
+
+    struct BuddyBlock* previousHole = NULL;
+    struct BuddyBlock* nextHole = NULL;
+    struct BuddyBlock* currentHole = firstHole;
+
+    while(currentHole!=NULL){
+        
+        if(previousHole->startAddress < currentHole->startAddress){
+            previousHole = currentHole;
+            nextHole = currentHole->next;
+        }
+        else{
+            nextHole = currentHole;
+            break;
+        }
+
+        currentHole=currentHole->next;
+    }
+
+    if(previousHole!=NULL){
+        object->previous = previousHole;
+        previousHole->next = object;
+    }
+    //case when there is no previous hole
+    else firstHole = object;
+
+    if(nextHole!=NULL){
+        nextHole->previous = object;
+        object->next = nextHole;
+    }
+
+    // now it is time to see if the holes can be merged
+
+    MergeHoles(object, nextObject);
+
+}
 
 void PrintBlock(struct BuddyBlock *block)
 {
@@ -243,7 +312,7 @@ void PrintBlock(struct BuddyBlock *block)
 
         while (currentBlock != NULL)
         {
-            size_t wholeBlockSize = (size_t)pow(2,currentBlock->order) * minimumSize;
+            size_t wholeBlockSize = (size_t)(1<<currentBlock->order) * minimumSize;
 
             printf("-----------------------------\n");
             printf("Block number: %d \n", blockNumber);
