@@ -18,7 +18,7 @@
 // Method used for buddy init
 int isPowerOfTwo(size_t n);
 
-//Method to calculate the order of a requested size
+// Method to calculate the order of a requested size
 int calculateOrder(size_t size, size_t low);
 
 // Method used to initialise the size and bounds of the allocator 
@@ -26,3 +26,6 @@ int buddyInit(size_t size, size_t low, size_t high);
 
 // Method used to allocate memory using the buddy system
 struct BuddyBlock* BuddyAlloc(size_t size);
+
+// Method used to print the whole Objects or Holes
+void PrintBlock(struct BuddyBlock *block);

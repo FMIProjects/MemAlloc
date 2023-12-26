@@ -20,7 +20,7 @@ int main()
         exit(EXIT_FAILURE);
     }
     
-    printf("%d\n", calculateOrder(11, 5));
+    printf("%d\n", calculateOrder(1, 5));
 
     exit(0);
 }
