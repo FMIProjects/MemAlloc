@@ -225,17 +225,34 @@ struct BuddyBlock* BuddyAlloc(size_t size){
     
 }
 
-/*
- -in order to merge a given hole it needs to have at least 1 neighbour hole of the same order
- -in order to merge 2 holes they need to be pairs 
- -one hole makes a pair with the hole that is in its right if the number of neighbouring blocks of the same order as the current hole in the right is odd
--one hole makes a pair with the hole that is in its left if the number of neighbouring blocks of the same order as the current hole in the right is even
-*/
-struct BuddyBlock* MergeHoles ( struct BuddyBlock* hole , struct BuddyBlock* nextObject){
+struct BuddyBlock* FindBuddy(struct BuddyBlock* hole){
+
+    // get the block size
+    size_t blockSize = (1<<hole->order) * minimumSize;
+
+    // find the address of the buddy
+    size_t buddyAddress = blockSize ^ hole->startAddress;
+
+
+    struct BuddyBlock* previousHole= hole->previous;
+    struct BuddyBlock* nextHole = hole->next;
+
+
+    // return the buddy if it is a hole of the same order as the given hole
+    if(previousHole->order == hole->order && previousHole->startAddress == buddyAddress)
+        return previousHole;
+
+    if(nextHole->order == hole->order && nextHole->startAddress == buddyAddress)
+        return nextHole;
+
+    return NULL;
+
+}
+
+struct BuddyBlock* MergeHoles ( struct BuddyBlock* hole ){
     int numberHolesSameOrder = 0;
 
     struct BuddyBlock* currentHole= hole;
-    struct BuddyBlock* currentObject = nextObject;
 }
 
 void FreeBuddyMemory(struct BuddyBlock* object){

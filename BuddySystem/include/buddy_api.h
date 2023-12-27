@@ -30,8 +30,11 @@ struct BuddyBlock* partitionHole(struct BuddyBlock* chosenHole, int stopOrder);
 // Method used to allocate memory using the buddy system
 struct BuddyBlock* BuddyAlloc(size_t size);
 
+// Method used to find the buddy of a block and return it if it is a hole of the same order
+struct BuddyBlock* FindBuddy(struct BuddyBlock* hole);
+
 // Method used to merge the given hole with the holes on the right if they can be merged
-struct BuddyBlock* MergeHoles ( struct BuddyBlock* hole , struct BuddyBlock* nextObject);
+struct BuddyBlock* MergeHoles ( struct BuddyBlock* hole);
 
 // Method used to deallocate memory from the buddy system
 void FreeBuddyMemory(struct BuddyBlock* object);
