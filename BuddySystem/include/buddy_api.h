@@ -45,7 +45,7 @@ void FreeBuddyMemory(struct BuddyBlock* object);
 // Method used to deallocate all buddy objects
 void BuddyReset();
 
-// Method used to deestroy the buddy workspace
+// Method used to destroy the buddy workspace
 void BuddyDestroy();
 
 // Method used to print the whole Objects or Holes

@@ -30,21 +30,24 @@ int main()
     // partitionHole(firstHole, 1);
 
     struct BuddyBlock* blk[100];
-    blk[0]=BuddyAlloc(134217728/2);
-    blk[1]=BuddyAlloc(134217728/2);
+    blk[0]=BuddyAlloc(16000);
+    FreeBuddyMemory(blk[0]);
+    // blk[0]=BuddyAlloc(134217728/2);
+    // blk[1]=BuddyAlloc(134217728/2);
     
+    // PrintBlock(firstObject);
+    // printf("\n");
+    // PrintBlock(firstHole);
+    // printf("%d\n", ValidateBlocks());
+
+
+    // BuddyDestroy();
+
     PrintBlock(firstObject);
     printf("\n");
     PrintBlock(firstHole);
     printf("%d\n", ValidateBlocks());
-
-
+    
     BuddyDestroy();
-
-    PrintBlock(firstObject);
-    printf("\n");
-    PrintBlock(firstHole);
-    printf("%d\n", ValidateBlocks());
-    
     exit(0);
 }
