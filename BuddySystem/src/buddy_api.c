@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <limits.h>
+#include<sys/types.h>
 
 //--------------------------- Declarations --------------------------------//
 
@@ -225,24 +226,36 @@ struct BuddyBlock* BuddyAlloc(size_t size){
     
 }
 
-struct BuddyBlock* FindBuddy(struct BuddyBlock* hole){
+size_t FindBuddyAddress(struct BuddyBlock* block){
+
+    if(block==NULL){
+        return (size_t)(0-1);
+    }
 
     // get the block size
-    size_t blockSize = (1<<hole->order) * minimumSize;
-
+    size_t blockSize = (1<<block->order) * minimumSize;
+    
     // find the address of the buddy
-    size_t buddyAddress = blockSize ^ hole->startAddress;
+    return blockSize ^ block->startAddress;
+}
 
+struct BuddyBlock* FindBuddy(struct BuddyBlock* hole){
+
+    if(hole==NULL)
+        return NULL;
+    
+    // find the address of the buddy
+    size_t buddyAddress = FindBuddyAddress(hole);
 
     struct BuddyBlock* previousHole= hole->previous;
     struct BuddyBlock* nextHole = hole->next;
 
 
     // return the buddy if it is a hole of the same order as the given hole
-    if(previousHole->order == hole->order && previousHole->startAddress == buddyAddress)
+    if(previousHole!=NULL && previousHole->order == hole->order && previousHole->startAddress == buddyAddress)
         return previousHole;
 
-    if(nextHole->order == hole->order && nextHole->startAddress == buddyAddress)
+    if( nextHole!=NULL && nextHole->order == hole->order && nextHole->startAddress == buddyAddress)
         return nextHole;
 
     return NULL;
@@ -250,9 +263,39 @@ struct BuddyBlock* FindBuddy(struct BuddyBlock* hole){
 }
 
 struct BuddyBlock* MergeHoles ( struct BuddyBlock* hole ){
-    int numberHolesSameOrder = 0;
 
-    struct BuddyBlock* currentHole= hole;
+    struct BuddyBlock* buddyBlock = FindBuddy(hole);
+    
+    // if there is no buddy just return the hole
+    if(buddyBlock == NULL)
+        return hole;
+    
+    
+    // case when the buddy is the previous hole of the given hole
+    if(hole->previous == buddyBlock){
+       
+        // make it so that the hole has the buddy on the right
+        return MergeHoles(buddyBlock);
+    }
+
+    // the current hole merges with its buddy
+
+    // the nextHole will be the buddy's next hole
+    struct BuddyBlock* nextHole = buddyBlock->next;
+
+    hole->size += buddyBlock->size;
+    ++hole->order; 
+    hole->next = nextHole;
+    
+    if(nextHole!=NULL)
+        nextHole->previous = hole;
+
+    // the buddy can be freed since it was merged
+    free(buddyBlock);
+
+    // continue merging till there is nothing to merge
+    return MergeHoles(hole);
+
 }
 
 void FreeBuddyMemory(struct BuddyBlock* object){
@@ -286,7 +329,7 @@ void FreeBuddyMemory(struct BuddyBlock* object){
 
     while(currentHole!=NULL){
         
-        if(previousHole->startAddress < currentHole->startAddress){
+        if(currentHole->startAddress < object->startAddress){
             previousHole = currentHole;
             nextHole = currentHole->next;
         }
@@ -312,7 +355,7 @@ void FreeBuddyMemory(struct BuddyBlock* object){
 
     // now it is time to see if the holes can be merged
 
-    MergeHoles(object, nextObject);
+    MergeHoles(object);
 
 }
 

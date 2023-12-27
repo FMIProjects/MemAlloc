@@ -30,6 +30,9 @@ struct BuddyBlock* partitionHole(struct BuddyBlock* chosenHole, int stopOrder);
 // Method used to allocate memory using the buddy system
 struct BuddyBlock* BuddyAlloc(size_t size);
 
+//Method used to calculate the addres of the buddy of the given block
+size_t FindBuddyAddress(struct BuddyBlock* block);
+
 // Method used to find the buddy of a block and return it if it is a hole of the same order
 struct BuddyBlock* FindBuddy(struct BuddyBlock* hole);
 
