@@ -49,6 +49,10 @@ int main()
     pthread_join(threadRandomAllocFree, NULL);
     pthread_join(threadStatistics, NULL);
 
+    
+
     free(memory);
+    DestroyFitAlgo();
+    
     exit(0);
 }

@@ -560,4 +560,16 @@ struct Block *AllocMemory(struct Block *currentHole, size_t processSize)
     return newObject;
 }
 
+void DestroyFitAlgo(){
+
+    // free all objects
+    while(firstObject!=NULL)
+        FreeMemory(firstObject);
+    
+    
+    //also free the firstHole
+    free(firstHole);
+    firstHole = NULL;
+}
+
 //------------------------------------------------------------------------//

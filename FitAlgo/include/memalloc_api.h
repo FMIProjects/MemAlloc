@@ -44,6 +44,9 @@ void FreeMemory(struct Block *object);
 // Custom Alloc Method
 struct Block *AllocMemory(struct Block *currentHole, size_t processSize);
 
+// Method used to safetly deallocate (literally) all used pointers
+void DestroyFitAlgo();
+
 //---------------------- Allocation Algorithms ----------------------//
 
 struct Block *FirstFit(size_t processSize);
