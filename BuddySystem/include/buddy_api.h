@@ -42,6 +42,12 @@ struct BuddyBlock* MergeHoles ( struct BuddyBlock* hole);
 // Method used to deallocate memory from the buddy system
 void FreeBuddyMemory(struct BuddyBlock* object);
 
+// Method used to deallocate all buddy objects
+void BuddyReset();
+
+// Method used to deestroy the buddy workspace
+void BuddyDestroy();
+
 // Method used to print the whole Objects or Holes
 void PrintBlock(struct BuddyBlock *block);
 // Method used to test if the sizes of the objects and holes are valid 

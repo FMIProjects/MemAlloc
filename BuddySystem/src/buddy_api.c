@@ -359,6 +359,27 @@ void FreeBuddyMemory(struct BuddyBlock* object){
 
 }
 
+void BuddyReset(){
+
+    // deallocate all objects
+    while(firstObject!=NULL){
+        FreeBuddyMemory(firstObject);
+    }
+
+}
+
+void BuddyDestroy(){
+    // reset all memory
+    BuddyReset();
+    // deallocate the whole memory
+    free(firstHole);
+    // reset the used variables
+    firstHole=NULL;
+    maxMemorySize=0;
+    minimumSize=0; 
+    maximumSize=0;
+}
+
 void PrintBlock(struct BuddyBlock *block)
 {
 
