@@ -1,5 +1,5 @@
-#ifndef _MA_MEMALLOC_API_H
-#define _MA_MEMALLOC_API_H
+#ifndef _MA_FITALGO_API_H
+#define _MA_FITALGO_API_H
 
 #include "block.h"
 #include "raf_params.h"
@@ -15,10 +15,21 @@
 // number of allocation/deallocation operations
 #define AFNUMBER 300000
 
-//--------------------------- Methods -------------------------------//
+//--------------------------- FitAlgo Specific Methods ----------------//
 
 // Method to allocate main block to heap
 void *AllocMainBlock();
+
+// Custom Alloc Method
+struct Block *AllocMemory(struct Block *currentHole, size_t processSize);
+
+// Custom Free Method
+void FreeMemory(struct Block *object);
+
+// Method used to safetly deallocate (literally) all used pointers
+void DestroyFitAlgo();
+
+//--------------------------- Utils Methods --------------------------//
 
 // Menu Method
 int Menu();
@@ -26,26 +37,17 @@ int Menu();
 // Statistics
 void *Statistics();
 
-// Method to generate random objects
-void GenerateRandomSizes(size_t *array);
-
 // Method to random allocate/free all sizes in the given array using the given algorithm
 void *RandomAllocFree(void *arg);
+
+// Method to generate random objects
+void GenerateRandomSizes(size_t *array);
 
 // Method to print the contents of a block
 void PrintBlock(struct Block *block);
 
 // Method to test if the summed sizes of all blocks are equal to MAINBLOCKSIZE
 int ValidateBlocks();
-
-// Custom Free Method
-void FreeMemory(struct Block *object);
-
-// Custom Alloc Method
-struct Block *AllocMemory(struct Block *currentHole, size_t processSize);
-
-// Method used to safetly deallocate (literally) all used pointers
-void DestroyFitAlgo();
 
 //---------------------- Allocation Algorithms ----------------------//
 

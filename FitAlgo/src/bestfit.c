@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
-#include "../include/memalloc_api.h"
+#include "../include/fitalgo_api.h"
 
 #define INT_MAX 2147483647;
 

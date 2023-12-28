@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include <unistd.h>
-#include "include/memalloc_api.h"
+#include "include/fitalgo_api.h"
 #include "include/block.h"
 #include "include/raf_params.h"
 
