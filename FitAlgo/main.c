@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <semaphore.h>
 #include <pthread.h>
 #include <unistd.h>
 #include "include/memalloc_api.h"

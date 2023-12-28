@@ -19,12 +19,9 @@
 
 //--------------------------- Methods -------------------------------//
 
-<<<<<<< HEAD
 // Menu Method
 void Menu();
 
-=======
->>>>>>> ec52452f4a9c7bb61b769b3a8f0278162fc22a08
 // Method to generate random objects
 void GenerateRandomSizes(size_t *array);
 

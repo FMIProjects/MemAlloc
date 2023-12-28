@@ -1,8 +1,10 @@
 #include "../include/buddy_api.h"
 #include "../include/colors.h"
+#include "../include/raf_params.h"
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <pthread.h>
 #include <math.h>
 #include <limits.h>
 #include <sys/types.h>
@@ -19,7 +21,6 @@ extern struct BuddyBlock *firstObject;
 
 //------------------------------ Methods ----------------------------------//
 
-<<<<<<< HEAD
 void Menu()
 {
     system("clear");
@@ -44,8 +45,6 @@ void Menu()
         perror("Wrong Input!"), exit(1);
 }
 
-=======
->>>>>>> ec52452f4a9c7bb61b769b3a8f0278162fc22a08
 void GenerateRandomSizes(size_t *array)
 {
 
@@ -65,6 +64,60 @@ void GenerateRandomSizes(size_t *array)
 
 void *RandomAllocFree(void *arg)
 {
+    printf("gothere\n");
+    struct RandomAllocFreeParams *params = (struct RandomAllocFreeParams *)arg;
+
+    int option = params->option;
+    size_t *array = params->sizes;
+
+    static unsigned int seed = 0;
+    srand(time(NULL) + seed);
+
+    size_t afRandom;
+    size_t freeIndexRandom;
+    size_t allocIndexRandom;
+    size_t indexAlloc = 0;
+
+    if (option == 1)
+    {
+        for (int i = 0; i < AFNUMBER; i++)
+        {
+            afRandom = (rand() % 2) + 1;
+            if (afRandom == 1)
+            {
+                allocIndexRandom = (rand() % OBJECTNUMBER) + 1;
+                BuddyAlloc(array[allocIndexRandom]);
+                indexAlloc++;
+            }
+            else 
+            {
+                if (indexAlloc != 0)
+                {
+                    freeIndexRandom = (rand() % indexAlloc) + 1;
+
+                    struct BuddyBlock *currentObject = firstObject;
+                    size_t currentIndex = 0;
+
+                    while (currentObject != NULL)
+                    {
+                        currentIndex++;
+                        if (currentIndex == freeIndexRandom)
+                            break;
+
+                        currentObject = currentObject->next;
+                    }
+
+                    if (currentObject != NULL)
+                    {
+                    FreeBuddyMemory(currentObject);
+                    indexAlloc--;
+                    }
+                }
+            }
+            printf("%d\n",i);
+        }
+    }
+    pthread_exit(NULL);
     return NULL;
 }
 

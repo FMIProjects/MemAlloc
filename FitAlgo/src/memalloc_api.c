@@ -4,7 +4,6 @@
 #include <stdlib.h>
 #include <time.h>
 #include <string.h>
-#include <semaphore.h>
 #include <pthread.h>
 #include <unistd.h>
 
@@ -93,7 +92,6 @@ void *RandomAllocFree(void *arg)
     int algo = params->algorithm;
     size_t *array = params->sizes;
 
-    struct Block *blk[OBJECTNUMBER];
     static unsigned int seed = 0;
 
     srand(time(NULL) + seed);
