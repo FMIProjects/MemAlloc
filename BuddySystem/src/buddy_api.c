@@ -1,4 +1,5 @@
 #include "../include/buddy_api.h"
+#include "../include/colors.h"
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -18,6 +19,33 @@ extern struct BuddyBlock *firstObject;
 
 //------------------------------ Methods ----------------------------------//
 
+<<<<<<< HEAD
+void Menu()
+{
+    system("clear");
+    printf(RED " ____            _     _        _____           _            \n");
+    printf("|  _ \\          | |   | |      / ____|         | |           \n");
+    printf("| |_) |_   _  __| | __| |_   _| (___  _   _ ___| |_ ___ _ __ ___  \n");
+    printf("|  _ <| | | |/ _` |/ _` | | | |\\___ \\| | | / __| __/ _ \\ '_ ` _ \\ \n");
+    printf("| |_) | |_| | (_| | (_| | |_| |____) | |_| \\__ \\ ||  __/ | | | | |\n");
+    printf("|____/ \\__,_|\\__,_|\\__,_|\\__, |_____/ \\__, |___/\\__\\___|_| |_| |_|\n");
+    printf("                        __/ |        __/ |                      \n");
+    printf("                       |___/        |___/                       \n" CRESET);
+    char input[10];
+    printf("==================================================================\n");
+    printf("Options:\n");
+    printf("==================================================================\n");
+    printf(BLU "1 - Start\n" CRESET);
+    printf("==================================================================\n");
+    printf("Input: ");
+    scanf("%s", input);
+    int number = atoi(input);
+    if (number > 1)
+        perror("Wrong Input!"), exit(1);
+}
+
+=======
+>>>>>>> ec52452f4a9c7bb61b769b3a8f0278162fc22a08
 void GenerateRandomSizes(size_t *array)
 {
 

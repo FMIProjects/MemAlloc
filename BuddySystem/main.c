@@ -25,26 +25,13 @@ int main()
     
     GenerateRandomSizes(vSizesToAllocate);
 
-    // printf("%p\n",firstHole);
-    // printf("%p\n",firstObject);
+    GenerateRandomSizes(vSizesToAllocate);
 
-    // partitionHole(firstHole, 0);
-
-    // BuddyAlloc(16000);
-    // partitionHole(firstHole, 1);
-
+    Menu();
+    
     struct BuddyBlock *blk[100];
     blk[0] = BuddyAlloc(16000);
     FreeBuddyMemory(blk[0]);
-    // blk[0]=BuddyAlloc(134217728/2);
-    // blk[1]=BuddyAlloc(134217728/2);
-
-    // PrintBlock(firstObject);
-    // printf("\n");
-    // PrintBlock(firstHole);
-    // printf("%d\n", ValidateBlocks());
-
-    // BuddyDestroy();
 
     PrintBlock(firstObject);
     printf("\n");

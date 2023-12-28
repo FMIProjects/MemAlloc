@@ -217,7 +217,7 @@ int Menu()
     printf("                            |___/       \n" CRESET);
     char input[10];
     printf("=============================================\n");
-    printf("Choose a memory allocation algorithm:\n");
+    printf("Options:\n");
     printf("=============================================\n");
     printf(BLU "1 - First Fit\n");
     printf("2 - Next Fit\n");
