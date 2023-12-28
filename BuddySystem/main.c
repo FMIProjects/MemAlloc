@@ -32,9 +32,7 @@ int main()
     }
     
     GenerateRandomSizes(vSizesToAllocate);
-
-    GenerateRandomSizes(vSizesToAllocate);
-
+    
     Menu();
 
     struct RandomAllocFreeParams params = {
@@ -44,17 +42,11 @@ int main()
     // create the threads
     pthread_t threadRandomAllocFree, threadStatistics;
     pthread_create(&threadRandomAllocFree, NULL, RandomAllocFree, (void *)&params);
+    pthread_create(&threadStatistics, NULL, Statistics, NULL);
 
-
-    struct BuddyBlock *blk[100];
-    blk[0] = BuddyAlloc(16000);
-    FreeBuddyMemory(blk[0]);
-
-
-
+    // wait for threads to finish
     pthread_join(threadRandomAllocFree, NULL);
-
-
+    pthread_join(threadStatistics, NULL);
 
     BuddyDestroy();
     exit(0);

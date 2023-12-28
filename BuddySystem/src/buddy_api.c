@@ -19,122 +19,22 @@ extern size_t maximumSize;
 extern struct BuddyBlock *firstHole;
 extern struct BuddyBlock *firstObject;
 
-//------------------------------ Methods ----------------------------------//
+extern pthread_mutex_t mutex;
+extern pthread_cond_t cond;
 
-void Menu()
-{
-    system("clear");
-    printf(RED " ____            _     _        _____           _            \n");
-    printf("|  _ \\          | |   | |      / ____|         | |           \n");
-    printf("| |_) |_   _  __| | __| |_   _| (___  _   _ ___| |_ ___ _ __ ___  \n");
-    printf("|  _ <| | | |/ _` |/ _` | | | |\\___ \\| | | / __| __/ _ \\ '_ ` _ \\ \n");
-    printf("| |_) | |_| | (_| | (_| | |_| |____) | |_| \\__ \\ ||  __/ | | | | |\n");
-    printf("|____/ \\__,_|\\__,_|\\__,_|\\__, |_____/ \\__, |___/\\__\\___|_| |_| |_|\n");
-    printf("                        __/ |        __/ |                      \n");
-    printf("                       |___/        |___/                       \n" CRESET);
-    char input[10];
-    printf("==================================================================\n");
-    printf("Options:\n");
-    printf("==================================================================\n");
-    printf(BLU "1 - Start\n" CRESET);
-    printf("==================================================================\n");
-    printf("Input: ");
-    scanf("%s", input);
-    int number = atoi(input);
-    if (number > 1)
-        perror("Wrong Input!"), exit(1);
-}
+int signalFlag = 0;
+int randomAllocFreeFinished = 0;
 
-void GenerateRandomSizes(size_t *array)
-{
+// number of allocations
+int allocNumber = 0;
+// number of frees
+int freeNumber = 0;
 
-    static unsigned int seed = 0;
+// used for measuring CPU time
+clock_t start;
+clock_t end;
 
-    srand(time(NULL) + seed);
-
-    for (int i = 0; i < OBJECTNUMBER; ++i)
-    {
-        // Generate a random size for each object [1,1024] bytes
-        size_t objectSize = (rand() % 1024) + 1;
-        array[i] = objectSize;
-    }
-
-    seed += 700119;
-}
-
-void *RandomAllocFree(void *arg)
-{
-    printf("gothere\n");
-    struct RandomAllocFreeParams *params = (struct RandomAllocFreeParams *)arg;
-
-    int option = params->option;
-    size_t *array = params->sizes;
-
-    static unsigned int seed = 0;
-    srand(time(NULL) + seed);
-
-    size_t afRandom;
-    size_t freeIndexRandom;
-    size_t allocIndexRandom;
-    size_t indexAlloc = 0;
-
-    if (option == 1)
-    {
-        for (int i = 0; i < AFNUMBER; i++)
-        {
-            afRandom = (rand() % 2) + 1;
-            if (afRandom == 1)
-            {
-                allocIndexRandom = (rand() % OBJECTNUMBER) + 1;
-                BuddyAlloc(array[allocIndexRandom]);
-                indexAlloc++;
-            }
-            else 
-            {
-                if (indexAlloc != 0)
-                {
-                    freeIndexRandom = (rand() % indexAlloc) + 1;
-
-                    struct BuddyBlock *currentObject = firstObject;
-                    size_t currentIndex = 0;
-
-                    while (currentObject != NULL)
-                    {
-                        currentIndex++;
-                        if (currentIndex == freeIndexRandom)
-                            break;
-
-                        currentObject = currentObject->next;
-                    }
-
-                    if (currentObject != NULL)
-                    {
-                    FreeBuddyMemory(currentObject);
-                    indexAlloc--;
-                    }
-                }
-            }
-            printf("%d\n",i);
-        }
-    }
-    pthread_exit(NULL);
-    return NULL;
-}
-
-int isPowerOfTwo(size_t n)
-{
-    return (n > 0) && ((n & (n - 1)) == 0);
-}
-
-int calculateOrder(size_t size, size_t low)
-{
-    int order = 0;
-
-    while ((1 << order) * low < size)
-        ++order;
-
-    return order;
-}
+//-------------------- Buddy Specific Methods ------------------------//
 
 int BuddyInit(size_t size, size_t low, size_t high)
 {
@@ -158,53 +58,6 @@ int BuddyInit(size_t size, size_t low, size_t high)
     firstHole->order = log2((double)size / low);
 
     return 0;
-}
-
-struct BuddyBlock *partitionHole(struct BuddyBlock *chosenHole, int stopOrder)
-{
-
-    if (chosenHole == NULL || stopOrder >= chosenHole->order)
-        return NULL;
-
-    struct BuddyBlock *previousHole = chosenHole->previous;
-    struct BuddyBlock *nextHole = chosenHole->next;
-
-    struct BuddyBlock *newHole = NULL;
-    struct BuddyBlock *currentHole = chosenHole;
-
-    while (currentHole->order != stopOrder)
-    {
-
-        // create a newHole
-        newHole = (struct BuddyBlock *)malloc(sizeof(struct BuddyBlock));
-        newHole->startAddress = currentHole->startAddress;
-        newHole->size = currentHole->size >> 1;
-        newHole->next = currentHole;
-        newHole->previous = NULL;
-        newHole->order = currentHole->order - 1;
-
-        // split the current Hole into half
-        currentHole->size = currentHole->size >> 1;
-        currentHole->previous = newHole;
-        currentHole->order -= 1;
-        currentHole->startAddress += currentHole->size;
-
-        currentHole = newHole;
-    }
-
-    // connect the new Hole to the previous hole of the now split chosen hole
-    newHole->previous = previousHole;
-
-    // also connect the previous Hole to the newHOle
-    if (previousHole != NULL)
-        previousHole->next = newHole;
-
-    // also get back the firstHole
-
-    while (firstHole->previous != NULL)
-        firstHole = firstHole->previous;
-
-    return newHole;
 }
 
 struct BuddyBlock *BuddyAlloc(size_t size)
@@ -295,8 +148,8 @@ struct BuddyBlock *BuddyAlloc(size_t size)
 
     // case when the objects need to be connected to other objects
 
-    struct BuddyBlock *nextObject;
-    struct BuddyBlock *previousObject;
+    struct BuddyBlock *nextObject = NULL;
+    struct BuddyBlock *previousObject = NULL;
     struct BuddyBlock *currentObject = firstObject;
 
     // we will find the suitable objects by comparing strat addresses
@@ -336,79 +189,6 @@ struct BuddyBlock *BuddyAlloc(size_t size)
     }
 
     return currentHole;
-}
-
-size_t FindBuddyAddress(struct BuddyBlock *block)
-{
-
-    if (block == NULL)
-    {
-        return (size_t)(0 - 1);
-    }
-
-    // get the block size
-    size_t blockSize = (1 << block->order) * minimumSize;
-
-    // find the address of the buddy
-    return blockSize ^ block->startAddress;
-}
-
-struct BuddyBlock *FindBuddy(struct BuddyBlock *hole)
-{
-
-    if (hole == NULL)
-        return NULL;
-
-    // find the address of the buddy
-    size_t buddyAddress = FindBuddyAddress(hole);
-
-    struct BuddyBlock *previousHole = hole->previous;
-    struct BuddyBlock *nextHole = hole->next;
-
-    // return the buddy if it is a hole of the same order as the given hole
-    if (previousHole != NULL && previousHole->order == hole->order && previousHole->startAddress == buddyAddress)
-        return previousHole;
-
-    if (nextHole != NULL && nextHole->order == hole->order && nextHole->startAddress == buddyAddress)
-        return nextHole;
-
-    return NULL;
-}
-
-struct BuddyBlock *MergeHoles(struct BuddyBlock *hole)
-{
-
-    struct BuddyBlock *buddyBlock = FindBuddy(hole);
-
-    // if there is no buddy just return the hole
-    if (buddyBlock == NULL)
-        return hole;
-
-    // case when the buddy is the previous hole of the given hole
-    if (hole->previous == buddyBlock)
-    {
-
-        // make it so that the hole has the buddy on the right
-        return MergeHoles(buddyBlock);
-    }
-
-    // the current hole merges with its buddy
-
-    // the nextHole will be the buddy's next hole
-    struct BuddyBlock *nextHole = buddyBlock->next;
-
-    hole->size += buddyBlock->size;
-    ++hole->order;
-    hole->next = nextHole;
-
-    if (nextHole != NULL)
-        nextHole->previous = hole;
-
-    // the buddy can be freed since it was merged
-    free(buddyBlock);
-
-    // continue merging till there is nothing to merge
-    return MergeHoles(hole);
 }
 
 void FreeBuddyMemory(struct BuddyBlock *object)
@@ -478,6 +258,111 @@ void FreeBuddyMemory(struct BuddyBlock *object)
     MergeHoles(object);
 }
 
+struct BuddyBlock *partitionHole(struct BuddyBlock *chosenHole, int stopOrder)
+{
+
+    if (chosenHole == NULL || stopOrder >= chosenHole->order)
+        return NULL;
+
+    struct BuddyBlock *previousHole = chosenHole->previous;
+    struct BuddyBlock *nextHole = chosenHole->next;
+
+    struct BuddyBlock *newHole = NULL;
+    struct BuddyBlock *currentHole = chosenHole;
+
+    while (currentHole->order != stopOrder)
+    {
+
+        // create a newHole
+        newHole = (struct BuddyBlock *)malloc(sizeof(struct BuddyBlock));
+        newHole->startAddress = currentHole->startAddress;
+        newHole->size = currentHole->size >> 1;
+        newHole->next = currentHole;
+        newHole->previous = NULL;
+        newHole->order = currentHole->order - 1;
+
+        // split the current Hole into half
+        currentHole->size = currentHole->size >> 1;
+        currentHole->previous = newHole;
+        currentHole->order -= 1;
+        currentHole->startAddress += currentHole->size;
+
+        currentHole = newHole;
+    }
+
+    // connect the new Hole to the previous hole of the now split chosen hole
+    newHole->previous = previousHole;
+
+    // also connect the previous Hole to the newHOle
+    if (previousHole != NULL)
+        previousHole->next = newHole;
+
+    // also get back the firstHole
+
+    while (firstHole->previous != NULL)
+        firstHole = firstHole->previous;
+
+    return newHole;
+}
+
+struct BuddyBlock *FindBuddy(struct BuddyBlock *hole)
+{
+
+    if (hole == NULL)
+        return NULL;
+
+    // find the address of the buddy
+    size_t buddyAddress = FindBuddyAddress(hole);
+
+    struct BuddyBlock *previousHole = hole->previous;
+    struct BuddyBlock *nextHole = hole->next;
+
+    // return the buddy if it is a hole of the same order as the given hole
+    if (previousHole != NULL && previousHole->order == hole->order && previousHole->startAddress == buddyAddress)
+        return previousHole;
+
+    if (nextHole != NULL && nextHole->order == hole->order && nextHole->startAddress == buddyAddress)
+        return nextHole;
+
+    return NULL;
+}
+
+struct BuddyBlock *MergeHoles(struct BuddyBlock *hole)
+{
+
+    struct BuddyBlock *buddyBlock = FindBuddy(hole);
+
+    // if there is no buddy just return the hole
+    if (buddyBlock == NULL)
+        return hole;
+
+    // case when the buddy is the previous hole of the given hole
+    if (hole->previous == buddyBlock)
+    {
+
+        // make it so that the hole has the buddy on the right
+        return MergeHoles(buddyBlock);
+    }
+
+    // the current hole merges with its buddy
+
+    // the nextHole will be the buddy's next hole
+    struct BuddyBlock *nextHole = buddyBlock->next;
+
+    hole->size += buddyBlock->size;
+    ++hole->order;
+    hole->next = nextHole;
+
+    if (nextHole != NULL)
+        nextHole->previous = hole;
+
+    // the buddy can be freed since it was merged
+    free(buddyBlock);
+
+    // continue merging till there is nothing to merge
+    return MergeHoles(hole);
+}
+
 void BuddyReset()
 {
 
@@ -499,6 +384,62 @@ void BuddyDestroy()
     maxMemorySize = 0;
     minimumSize = 0;
     maximumSize = 0;
+}
+
+size_t FindBuddyAddress(struct BuddyBlock *block)
+{
+
+    if (block == NULL)
+    {
+        return (size_t)(0 - 1);
+    }
+
+    // get the block size
+    size_t blockSize = (1 << block->order) * minimumSize;
+
+    // find the address of the buddy
+    return blockSize ^ block->startAddress;
+}
+
+int isPowerOfTwo(size_t n)
+{
+    return (n > 0) && ((n & (n - 1)) == 0);
+}
+
+int calculateOrder(size_t size, size_t low)
+{
+    int order = 0;
+
+    while ((1 << order) * low < size)
+        ++order;
+
+    return order;
+}
+
+//--------------------------- Utils Methods --------------------------------//
+
+void Menu()
+{
+    system("clear");
+    printf(RED " ____            _     _        _____           _            \n");
+    printf("|  _ \\          | |   | |      / ____|         | |           \n");
+    printf("| |_) |_   _  __| | __| |_   _| (___  _   _ ___| |_ ___ _ __ ___  \n");
+    printf("|  _ <| | | |/ _` |/ _` | | | |\\___ \\| | | / __| __/ _ \\ '_ ` _ \\ \n");
+    printf("| |_) | |_| | (_| | (_| | |_| |____) | |_| \\__ \\ ||  __/ | | | | |\n");
+    printf("|____/ \\__,_|\\__,_|\\__,_|\\__, |_____/ \\__, |___/\\__\\___|_| |_| |_|\n");
+    printf("                        __/ |        __/ |                      \n");
+    printf("                       |___/        |___/                       \n" CRESET);
+    char input[10];
+    printf("==================================================================\n");
+    printf("Options:\n");
+    printf("==================================================================\n");
+    printf(BLU "1 - Start\n" CRESET);
+    printf("==================================================================\n");
+    printf("Input: ");
+    scanf("%s", input);
+    int number = atoi(input);
+    if (number > 1)
+        perror("Wrong Input!"), exit(1);
 }
 
 void PrintBlock(struct BuddyBlock *block)
@@ -572,4 +513,164 @@ int ValidateBlocks()
     }
 
     return (summedSizes == maxMemorySize);
+}
+
+void *Statistics()
+{
+    while (1)
+    {
+        pthread_mutex_lock(&mutex);
+
+        // Statistics Methos waits for a signal from RandomAllocFree Method
+        while (!signalFlag && !randomAllocFreeFinished)
+        {
+            pthread_cond_wait(&cond, &mutex);
+        }
+        // reset the signal to wait again for another
+        signalFlag = 0;
+        double elapsed = ((double)(end - start)) / CLOCKS_PER_SEC;
+        pthread_mutex_unlock(&mutex);
+
+        // if RandomAllocFree finished we close the statistics thread
+        if (randomAllocFreeFinished)
+            break;
+
+        // Statistics Logic
+        system("clear");
+        struct BuddyBlock *currentHole = firstHole;
+        struct BuddyBlock *currentBlock = firstObject;
+        float externalFragmentation = 0;
+        float internalFragmentation = 0;
+        int holeNumber = 0;
+
+        pthread_mutex_lock(&mutex);
+        while (currentHole != NULL)
+        {
+            holeNumber++;
+            externalFragmentation += currentHole->size;
+            currentHole = currentHole->next;
+        }
+
+        while (currentBlock != NULL)
+        {
+            size_t wholeBlockSize = (size_t)(1 << currentBlock->order) * minimumSize;
+
+            internalFragmentation += wholeBlockSize - currentBlock->size;
+            currentBlock = currentBlock->next;
+        }
+
+        pthread_mutex_unlock(&mutex);
+
+        printf("Memory Statistics:\n");
+        printf("=========================================\n");
+        printf(BLU "Number of allocations: %d\n", allocNumber);
+        printf("Number of deallocations: %d\n", freeNumber);
+        printf("Number of holes: %d\n" CRESET, holeNumber);
+        printf(RED "External Fragmentation: %.6f KB\n" CRESET, externalFragmentation / 1000);
+        printf(RED "Internal Fragmentation: %.6f KB\n" CRESET, internalFragmentation / 1000);
+        printf(YEL "CPU Time: %.3f seconds\n" CRESET, elapsed);
+        printf("=========================================\n");
+        // End of Statistics Logic
+    }
+
+    pthread_exit(NULL);
+    return NULL;
+}
+
+void *RandomAllocFree(void *arg)
+{
+    start = clock();
+
+    struct RandomAllocFreeParams *params = (struct RandomAllocFreeParams *)arg;
+
+    int option = params->option;
+    size_t *array = params->sizes;
+
+    static unsigned int seed = 0;
+    srand(time(NULL) + seed);
+
+    size_t afRandom;
+    size_t freeIndexRandom;
+    size_t allocIndexRandom;
+    size_t indexAlloc = 0;
+
+    if (option == 1)
+    {
+        for (int i = 0; i < AFNUMBER; i++)
+        {
+            afRandom = (rand() % 2) + 1;
+            if (afRandom == 1)
+            {
+                allocNumber++;
+                allocIndexRandom = (rand() % OBJECTNUMBER) + 1;
+
+                pthread_mutex_lock(&mutex);
+                BuddyAlloc(array[allocIndexRandom]);
+                indexAlloc++;
+                pthread_mutex_unlock(&mutex);
+            }
+            else
+            {
+                if (indexAlloc != 0)
+                {
+                    freeNumber++;
+                    freeIndexRandom = (rand() % indexAlloc) + 1;
+
+                    struct BuddyBlock *currentObject = firstObject;
+                    size_t currentIndex = 0;
+
+                    pthread_mutex_lock(&mutex);
+                    while (currentObject != NULL)
+                    {
+                        currentIndex++;
+                        if (currentIndex == freeIndexRandom)
+                            break;
+
+                        currentObject = currentObject->next;
+                    }
+
+                    if (currentObject != NULL)
+                    {
+                        FreeBuddyMemory(currentObject);
+                        indexAlloc--;
+                    }
+                    pthread_mutex_unlock(&mutex);
+                }
+            }
+            if (i % 1000 == 0)
+            {
+                pthread_mutex_lock(&mutex);
+                // Signal the Statistics thread to print
+                end = clock();
+                signalFlag = 1;
+                pthread_cond_signal(&cond);
+                pthread_mutex_unlock(&mutex);
+            }
+        }
+    }
+    pthread_mutex_lock(&mutex);
+    randomAllocFreeFinished = 1;
+    // Signal the Statistics thread to check the flag
+    // to exit the loop
+    pthread_cond_signal(&cond);
+    pthread_mutex_unlock(&mutex);
+    pthread_exit(NULL);
+    return NULL;
+}
+
+void GenerateRandomSizes(size_t *array)
+{
+
+    static unsigned int seed = 0;
+
+    srand(time(NULL) + seed);
+
+    for (int i = 0; i < OBJECTNUMBER; ++i)
+    {
+        // Generate a random size for each object [1,1024] bytes
+        size_t objectSize = (rand() % 1024) + 1;
+        array[i] = objectSize;
+    }
+
+    seed += 700119;
 }

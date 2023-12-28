@@ -256,6 +256,7 @@ void *Statistics()
         float externalFragmentation = 0;
         int holeNumber = 0;
 
+        pthread_mutex_lock(&mutex);
         while (currentHole != NULL)
         {
             holeNumber++;
@@ -263,7 +264,7 @@ void *Statistics()
             currentHole = currentHole->next;
         }
 
-        // pthread_mutex_unlock(&mutex);
+        pthread_mutex_unlock(&mutex);
 
         printf("Memory Statistics:\n");
         printf("=========================================\n");

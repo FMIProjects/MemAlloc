@@ -17,34 +17,19 @@
 // number of allocation/deallocation operations
 #define AFNUMBER 300000
 
-//--------------------------- Methods -------------------------------//
-
-// Menu Method
-void Menu();
-
-// Method to generate random objects
-void GenerateRandomSizes(size_t *array);
-
-// Method to random allocate/free blocks for buddy
-void *RandomAllocFree(void *arg);
-
-// Method used for buddy init
-int isPowerOfTwo(size_t n);
-
-// Method to calculate the order of a requested size
-int calculateOrder(size_t size, size_t low);
+//-------------------- Buddy Specific Methods ------------------------//
 
 // Method used to initialise the size and bounds of the allocator
 int BuddyInit(size_t size, size_t low, size_t high);
 
-// Method used to partition of hole till one the order equal to stopOrder is found, returns the first Hole with the order equal to stopOrder
-struct BuddyBlock *partitionHole(struct BuddyBlock *chosenHole, int stopOrder);
-
 // Method used to allocate memory using the buddy system
 struct BuddyBlock *BuddyAlloc(size_t size);
 
-// Method used to calculate the addres of the buddy of the given block
-size_t FindBuddyAddress(struct BuddyBlock *block);
+// Method used to deallocate memory from the buddy system
+void FreeBuddyMemory(struct BuddyBlock *object);
+
+// Method used to partition of hole till one the order equal to stopOrder is found, returns the first Hole with the order equal to stopOrder
+struct BuddyBlock *partitionHole(struct BuddyBlock *chosenHole, int stopOrder);
 
 // Method used to find the buddy of a block and return it if it is a hole of the same order
 struct BuddyBlock *FindBuddy(struct BuddyBlock *hole);
@@ -52,17 +37,37 @@ struct BuddyBlock *FindBuddy(struct BuddyBlock *hole);
 // Method used to merge the given hole with the holes on the right if they can be merged
 struct BuddyBlock *MergeHoles(struct BuddyBlock *hole);
 
-// Method used to deallocate memory from the buddy system
-void FreeBuddyMemory(struct BuddyBlock *object);
-
 // Method used to deallocate all buddy objects
 void BuddyReset();
 
 // Method used to destroy the buddy workspace
 void BuddyDestroy();
 
+// Method used to calculate the addres of the buddy of the given block
+size_t FindBuddyAddress(struct BuddyBlock *block);
+
+// Method used for buddy init
+int isPowerOfTwo(size_t n);
+
+// Method to calculate the order of a requested size
+int calculateOrder(size_t size, size_t low);
+
+//--------------------------- Utils Methods --------------------------------//
+
+// Menu Method
+void Menu();
+
 // Method used to print the whole Objects or Holes
 void PrintBlock(struct BuddyBlock *block);
 
 // Method used to test if the sizes of the objects and holes are valid
 int ValidateBlocks();
+
+// Statistics Method
+void *Statistics();
+
+// Method to random allocate/free blocks for buddy
+void *RandomAllocFree(void *arg);
+
+// Method to generate random objects
+void GenerateRandomSizes(size_t *array);
