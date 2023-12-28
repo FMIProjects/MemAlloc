@@ -605,8 +605,11 @@ void *RandomAllocFree(void *arg)
                 allocIndexRandom = (rand() % OBJECTNUMBER) + 1;
 
                 pthread_mutex_lock(&mutex);
-                BuddyAlloc(array[allocIndexRandom]);
-                indexAlloc++;
+                if(BuddyAlloc(array[allocIndexRandom])){
+                    ++indexAlloc;
+                }
+                
+                
                 pthread_mutex_unlock(&mutex);
             }
             else
