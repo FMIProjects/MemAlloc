@@ -21,13 +21,14 @@ extern pthread_cond_t cond;
 int signalFlag = 0;
 int randomAllocFreeFinished = 0;
 
+// number of allocations
 int allocNumber = 0;
+// number of frees
 int freeNumber = 0;
 
-//used for measuring CPU time
+// used for measuring CPU time
 clock_t start;
 clock_t end;
-
 
 //------------------------------ Methods ----------------------------------//
 
@@ -207,19 +208,19 @@ void PrintBlock(struct Block *block)
 int Menu()
 {
     system("clear");
-    printf(RED"    ______ _ _            _             \n");
+    printf(RED "    ______ _ _            _             \n");
     printf("   |  ____(_) |     /\\   | |            \n");
     printf("   | |__   _| |_   /  \\  | | __ _  ___  \n");
     printf("   |  __| | | __| / /\\ \\ | |/ _` |/ _ \\ \n");
     printf("   | |    | | |_ / ____ \\| | (_| | (_) |\n");
     printf("   |_|    |_|\\__/_/    \\_\\_|\\__, |\\___/ \n");
     printf("                             __/ |      \n");
-    printf("                            |___/       \n"CRESET);
+    printf("                            |___/       \n" CRESET);
     char input[10];
     printf("=============================================\n");
     printf("Choose a memory allocation algorithm:\n");
     printf("=============================================\n");
-    printf(BLU"1 - First Fit\n");
+    printf(BLU "1 - First Fit\n");
     printf("2 - Next Fit\n");
     printf("3 - Best Fit\n");
     printf("4 - Worst Fit\n" CRESET);
@@ -265,15 +266,15 @@ void *Statistics()
             currentHole = currentHole->next;
         }
 
-        // pthread_mutex_unlock(&mutex);    
+        // pthread_mutex_unlock(&mutex);
 
         printf("Memory Statistics:\n");
         printf("=========================================\n");
-        printf(BLU"Number of allocations: %d\n", allocNumber);
+        printf(BLU "Number of allocations: %d\n", allocNumber);
         printf("Number of deallocations: %d\n", freeNumber);
-        printf("Number of holes: %d\n"CRESET, holeNumber);
-        printf(RED"External Fragmentation: %.6f KB\n"CRESET, externalFragmentation / 1000);
-        printf(YEL"CPU Time: %.3f seconds\n"CRESET, elapsed);
+        printf("Number of holes: %d\n" CRESET, holeNumber);
+        printf(RED "External Fragmentation: %.6f KB\n" CRESET, externalFragmentation / 1000);
+        printf(YEL "CPU Time: %.3f seconds\n" CRESET, elapsed);
         printf("=========================================\n");
         // End of Statistics Logic
     }
@@ -560,14 +561,14 @@ struct Block *AllocMemory(struct Block *currentHole, size_t processSize)
     return newObject;
 }
 
-void DestroyFitAlgo(){
+void DestroyFitAlgo()
+{
 
     // free all objects
-    while(firstObject!=NULL)
+    while (firstObject != NULL)
         FreeMemory(firstObject);
-    
-    
-    //also free the firstHole
+
+    // also free the firstHole
     free(firstHole);
     firstHole = NULL;
 }
