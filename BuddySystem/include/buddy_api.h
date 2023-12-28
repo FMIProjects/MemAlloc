@@ -12,8 +12,18 @@
 #define MINIMUMSIZE 1024
 // the maximum size that can be allocated is 64 MB => 67108864 (2^26) bytes
 #define MAXIMUMSIZE 67108864
+// Number of Objects
+#define OBJECTNUMBER 10000
+// number of allocation/deallocation operations
+#define AFNUMBER 300000
 
 //--------------------------- Methods -------------------------------//
+
+// Method to generate random objects
+void GenerateRandomSizes(size_t *array);
+
+// Method to random allocate/free blocks for buddy
+void *RandomAllocFree(void *arg);
 
 // Method used for buddy init
 int isPowerOfTwo(size_t n);

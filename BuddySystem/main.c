@@ -4,6 +4,9 @@
 #include "include/buddy_api.h"
 #include "include/buddyblock.h"
 #include <math.h>
+
+size_t vSizesToAllocate[OBJECTNUMBER];
+
 size_t maxMemorySize;
 size_t minimumSize;
 size_t maximumSize;
@@ -19,6 +22,8 @@ int main()
         perror("Invalid allocator parameters\n\a");
         exit(EXIT_FAILURE);
     }
+    
+    GenerateRandomSizes(vSizesToAllocate);
 
     // printf("%p\n",firstHole);
     // printf("%p\n",firstObject);

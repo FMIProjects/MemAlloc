@@ -5,6 +5,7 @@
 #include <math.h>
 #include <limits.h>
 #include <sys/types.h>
+#include <time.h>
 
 //--------------------------- Declarations --------------------------------//
 
@@ -16,6 +17,28 @@ extern struct BuddyBlock *firstHole;
 extern struct BuddyBlock *firstObject;
 
 //------------------------------ Methods ----------------------------------//
+
+void GenerateRandomSizes(size_t *array)
+{
+
+    static unsigned int seed = 0;
+
+    srand(time(NULL) + seed);
+
+    for (int i = 0; i < OBJECTNUMBER; ++i)
+    {
+        // Generate a random size for each object [1,1024] bytes
+        size_t objectSize = (rand() % 1024) + 1;
+        array[i] = objectSize;
+    }
+
+    seed += 700119;
+}
+
+void *RandomAllocFree(void *arg)
+{
+    return NULL;
+}
 
 int isPowerOfTwo(size_t n)
 {

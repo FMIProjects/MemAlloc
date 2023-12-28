@@ -12,7 +12,7 @@
 #define OBJECTNUMBER 10000
 // Maximum number of holes that can be created
 #define MAX_HOLES 52428800
-// maximum number of allocation/deallocation operations
+// number of allocation/deallocation operations
 #define AFNUMBER 300000
 
 //--------------------------- Methods -------------------------------//
