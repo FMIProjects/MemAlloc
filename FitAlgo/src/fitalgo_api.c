@@ -21,8 +21,13 @@ int randomAllocFreeFinished = 0;
 
 // number of allocations
 int allocNumber = 0;
+// how many blocks were allocated
+int succesfulAllocations = 0;
+
 // number of frees
 int freeNumber = 0;
+// how many blocks were freed
+int succesfulFrees = 0;
 
 // used for measuring CPU time
 clock_t start;
@@ -400,8 +405,10 @@ void *Statistics()
 
         printf("Memory Statistics:\n");
         printf("=========================================\n");
-        printf(BLU "Number of allocations: %d\n", allocNumber);
-        printf("Number of deallocations: %d\n", freeNumber);
+        printf(BLU "Number of tries of allocations: %d\n", allocNumber);
+        printf("Number of succesful allocations: %d\n", succesfulAllocations);
+        printf("Number of tries of deallocations: %d\n", freeNumber);
+        printf("Number of succesful deallocations: %d\n", succesfulFrees);
         printf("Number of holes: %d\n" CRESET, holeNumber);
         printf(RED "External Fragmentation: %.6f KB\n" CRESET, externalFragmentation / 1000);
         printf(YEL "CPU Time: %.3f seconds\n" CRESET, elapsed);
@@ -431,41 +438,50 @@ void *RandomAllocFree(void *arg)
     size_t allocIndexRandom;
     size_t indexAlloc = 0;
 
-    for (int i = 0; i < AFNUMBER; i++)
+    for (int i = 0; i < AFNUMBER; ++i)
     {
         afRandom = (rand() % 2) + 1;
         if (afRandom == 1)
         {
-            allocNumber++;
+            ++allocNumber;
 
             allocIndexRandom = (rand() % OBJECTNUMBER) + 1;
             pthread_mutex_lock(&mutex);
+
+            struct Block* auxBlock;
+
             switch (algo)
             {
             case 1:
-                FirstFit(array[allocIndexRandom]);
+                auxBlock = FirstFit(array[allocIndexRandom]);
                 break;
             case 2:
-                NextFit(array[allocIndexRandom]);
+                auxBlock = NextFit(array[allocIndexRandom]);
                 break;
             case 3:
-                BestFit(array[allocIndexRandom]);
+                auxBlock = BestFit(array[allocIndexRandom]);
                 break;
             case 4:
-                WorstFit(array[allocIndexRandom]);
+                auxBlock = WorstFit(array[allocIndexRandom]);
                 break;
             default:
                 pthread_mutex_unlock(&mutex);
                 return NULL;
             }
-            indexAlloc++;
+            if(auxBlock != NULL){
+                ++indexAlloc;
+                ++succesfulAllocations;
+            }
+
+           
             pthread_mutex_unlock(&mutex);
         }
         else
         {
+            ++freeNumber;
             if (indexAlloc != 0)
             {
-                freeNumber++;
+                ++succesfulFrees;
                 freeIndexRandom = (rand() % indexAlloc) + 1;
                 struct Block *currentObject = firstObject;
                 size_t currentIndex = 0;
@@ -474,7 +490,7 @@ void *RandomAllocFree(void *arg)
                 // search into the list the first large enough hole
                 while (currentObject != NULL)
                 {
-                    currentIndex++;
+                    ++currentIndex;
                     if (currentIndex == freeIndexRandom)
                         break;
 
@@ -484,7 +500,7 @@ void *RandomAllocFree(void *arg)
                 if (currentObject != NULL)
                 {
                     FreeMemory(currentObject);
-                    indexAlloc--;
+                    --indexAlloc;
                 }
                 pthread_mutex_unlock(&mutex);
             }

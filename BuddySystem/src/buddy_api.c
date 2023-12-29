@@ -27,8 +27,13 @@ int randomAllocFreeFinished = 0;
 
 // number of allocations
 int allocNumber = 0;
+// how many blocks were allocated
+int succesfulAllocations = 0;
+
 // number of frees
 int freeNumber = 0;
+// how many blocks were freed
+int succesfulFrees = 0;
 
 // used for measuring CPU time
 clock_t start;
@@ -173,12 +178,16 @@ struct BuddyBlock *BuddyAlloc(size_t size)
         currentObject = currentObject->next;
     }
 
-    // connect the allocated object ( currentHole ) to the found objects ifn they exist
+    // connect the allocated object ( currentHole ) to the found objects if they exist
     if (previousObject != NULL)
     {
 
         previousObject->next = currentHole;
         currentHole->previous = previousObject;
+    }
+    // if there is no previous object, it means that the hole where the object will pe allocated becomes the first object
+    else{
+        firstObject = currentHole;
     }
 
     if (nextObject != NULL)
@@ -563,8 +572,10 @@ void *Statistics()
 
         printf("Memory Statistics:\n");
         printf("=========================================\n");
-        printf(BLU "Number of allocations: %d\n", allocNumber);
-        printf("Number of deallocations: %d\n", freeNumber);
+        printf(BLU "Number of tries of allocations: %d\n", allocNumber);
+        printf("Number of succesful allocations: %d\n", succesfulAllocations);
+        printf("Number of tries of deallocations: %d\n", freeNumber);
+        printf("Number of succesful deallocations: %d\n", succesfulFrees);
         printf("Number of holes: %d\n" CRESET, holeNumber);
         printf(RED "External Fragmentation: %.6f KB\n" CRESET, externalFragmentation / 1000);
         printf(RED "Internal Fragmentation: %.6f KB\n" CRESET, internalFragmentation / 1000);
@@ -601,12 +612,13 @@ void *RandomAllocFree(void *arg)
             afRandom = (rand() % 2) + 1;
             if (afRandom == 1)
             {
-                allocNumber++;
+                ++allocNumber;
                 allocIndexRandom = (rand() % OBJECTNUMBER) + 1;
 
                 pthread_mutex_lock(&mutex);
                 if(BuddyAlloc(array[allocIndexRandom])){
                     ++indexAlloc;
+                    ++succesfulAllocations;
                 }
                 
                 
@@ -614,9 +626,12 @@ void *RandomAllocFree(void *arg)
             }
             else
             {
+                ++freeNumber;
+
                 if (indexAlloc != 0)
                 {
-                    freeNumber++;
+                    
+                    ++succesfulFrees;
                     freeIndexRandom = (rand() % indexAlloc) + 1;
 
                     struct BuddyBlock *currentObject = firstObject;
@@ -635,7 +650,7 @@ void *RandomAllocFree(void *arg)
                     if (currentObject != NULL)
                     {
                         FreeBuddyMemory(currentObject);
-                        indexAlloc--;
+                        --indexAlloc;
                     }
                     pthread_mutex_unlock(&mutex);
                 }
