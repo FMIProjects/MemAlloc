@@ -6,12 +6,17 @@
 #include "buddyblock.h"
 //--------------------------- Defines --------------------------------//
 
-// one MB is 1048576 (2^20) bytes => 128 MB is 134217728 (2^27) bytes
-#define MAINBLOCKSIZE 134217728
-// the minimum size that can be allocated is 1024 (2^10) bytes => 1MB/1024B
-#define MINIMUMSIZE 1024
-// the maximum size that can be allocated is 64 MB => 67108864 (2^26) bytes
-#define MAXIMUMSIZE 67108864
+// // one MB is 1048576 (2^20) bytes => 128 MB is 134217728 (2^27) bytes
+// #define MAINBLOCKSIZE 134217728
+// // the minimum size of a block is 1024 (2^10) bytes => 1MB/1024B
+// #define MINIMUMSIZE 1024
+// // the maximum size that can be allocated is 64 MB => 67108864 (2^26) bytes
+// #define MAXIMUMSIZE 67108864
+
+#define MAINBLOCKSIZE 536870912  // 512 MB (2^29 bytes)
+#define MINIMUMSIZE   4096       // 4 KB (2^12 bytes)
+#define MAXIMUMSIZE   67108864   // 64 MB (2^26 bytes)
+
 // Number of Objects
 #define OBJECTNUMBER 10000
 // number of allocation/deallocation operations
